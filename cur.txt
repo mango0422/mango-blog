@@ -1,0 +1,766 @@
+// C:\workspace\mango-blog\eslint.config.mjs
+import { defineConfig, globalIgnores } from "eslint/config";
+import nextVitals from "eslint-config-next/core-web-vitals";
+import nextTs from "eslint-config-next/typescript";
+
+const eslintConfig = defineConfig([
+  ...nextVitals,
+  ...nextTs,
+  // Override default ignores of eslint-config-next.
+  globalIgnores([
+    // Default ignores of eslint-config-next:
+    ".next/**",
+    "out/**",
+    "build/**",
+    "next-env.d.ts",
+  ]),
+]);
+
+export default eslintConfig;
+
+
+
+// C:\workspace\mango-blog\next-env.d.ts
+/// <reference types="next" />
+/// <reference types="next/image-types/global" />
+import "./.next/dev/types/routes.d.ts";
+
+// NOTE: This file should not be edited
+// see https://nextjs.org/docs/app/api-reference/config/typescript for more information.
+
+
+
+// C:\workspace\mango-blog\next.config.ts
+import type { NextConfig } from "next";
+
+const nextConfig: NextConfig = {
+  reactStrictMode: true,
+  /* config options here */
+  reactCompiler: true,
+  experimental: {
+    // 필요 시 여기에 실험 옵션 추가
+  },
+};
+
+export default nextConfig;
+
+
+
+// C:\workspace\mango-blog\package.json
+{
+  "name": "mango-blog",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "next": "16.0.2",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "react-markdown": "10.1.0",
+    "rehype-raw": "7.0.0",
+    "remark-gfm": "4.0.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "4.1.17",
+    "@types/node": "20.19.25",
+    "@types/react": "19.2.4",
+    "@types/react-dom": "19.2.3",
+    "babel-plugin-react-compiler": "1.0.0",
+    "eslint": "9.39.1",
+    "eslint-config-next": "16.0.2",
+    "tailwindcss": "4.1.17",
+    "typescript": "5.9.3"
+  }
+}
+
+
+
+// C:\workspace\mango-blog\postcss.config.mjs
+const config = {
+  plugins: {
+    "@tailwindcss/postcss": {},
+  },
+};
+
+export default config;
+
+
+
+// C:\workspace\mango-blog\README.md
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+
+## Getting Started
+
+First, run the development server:
+
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+
+## Learn More
+
+To learn more about Next.js, take a look at the following resources:
+
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+
+## Deploy on Vercel
+
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+
+
+// C:\workspace\mango-blog\tsconfig.json
+{
+  "compilerOptions": {
+    "target": "ES2017",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "react-jsx",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts",
+    "**/*.mts"
+  ],
+  "exclude": ["node_modules"]
+}
+
+
+
+// C:\workspace\mango-blog\src\app\globals.css
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  @apply bg-slate-950 text-slate-50;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+}
+
+
+
+// C:\workspace\mango-blog\src\app\layout.tsx
+// app/layout.tsx
+import type { ReactNode } from "react";
+import type { Metadata } from "next";
+import "./globals.css";
+import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "mango-blog",
+  description: "SQLD 오답노트 & 개발 블로그",
+};
+
+export default function RootLayout({ children }: { children: ReactNode }) {
+  return (
+    <html lang="ko">
+      <body className="min-h-screen bg-slate-950 text-slate-50">
+        <div className="mx-auto flex min-h-screen max-w-4xl flex-col px-4 py-6">
+          <header className="mb-6 flex items-center justify-between border-b border-slate-800 pb-3">
+            <h1 className="text-lg font-semibold tracking-tight">
+              <span className="text-emerald-400">mango</span>
+              <span className="text-slate-200">-blog</span>
+            </h1>
+            <nav className="flex gap-4 text-sm text-slate-400">
+              <Link href="/" className="hover:text-slate-100">
+                홈
+              </Link>
+              <Link href="/sqld" className="hover:text-slate-100">
+                SQLD 오답노트
+              </Link>
+            </nav>
+          </header>
+          <main className="flex-1 pb-10">{children}</main>
+          <footer className="border-t border-slate-900 pt-4 text-xs text-slate-500">
+            © {new Date().getFullYear()} mango blog
+          </footer>
+        </div>
+      </body>
+    </html>
+  );
+}
+
+
+
+// C:\workspace\mango-blog\src\app\page.tsx
+// app/page.tsx
+export default function HomePage() {
+  return (
+    <section className="space-y-4">
+      <h2 className="text-lg font-semibold text-slate-50">환영합니다 👋</h2>
+      <p className="text-sm text-slate-300">
+        이곳은 SQlD, 정보처리기사, CS 등 시험·개발 공부를 위해 만든{" "}
+        <span className="font-medium text-emerald-300">오답노트 / 블로그</span>
+        입니다.
+      </p>
+      <ul className="list-disc space-y-1 pl-5 text-sm text-slate-300">
+        <li>우선은 SQLD 오답노트부터 정리합니다.</li>
+        <li>
+          각 노트는 &quot;틀린 이유 → 개념 정리 → 예제&quot; 구조로 정리합니다.
+        </li>
+      </ul>
+      <p className="text-sm text-slate-400">
+        상단 메뉴의 <span className="text-emerald-300">SQLD 오답노트</span>에서
+        시작하세요.
+      </p>
+    </section>
+  );
+}
+
+
+
+// C:\workspace\mango-blog\src\app\(post)\sqld\page.tsx
+// app/(post)/sqld/page.tsx
+import { sqldNotes } from "@/data/sqld/notes.data";
+import { NoteList } from "@/components/sqld/NoteList";
+import { sortNotesByNextReview } from "@/lib/sqld/note-filters";
+
+export default function SqldListPage() {
+  const sorted = sortNotesByNextReview(sqldNotes);
+
+  return (
+    <section className="space-y-4">
+      <header className="space-y-1">
+        <h1 className="text-lg font-semibold text-slate-50">SQLD 오답노트</h1>
+        <p className="text-sm text-slate-400">
+          틀렸던 문제와 개념을 정리해두고, 중요도와 복습 일정을 기준으로
+          관리합니다.
+        </p>
+      </header>
+
+      {/* TODO: 나중에 필터/검색 UI 추가 */}
+      <NoteList notes={sorted} />
+    </section>
+  );
+}
+
+
+
+// C:\workspace\mango-blog\src\app\(post)\sqld\[slug]\page.tsx
+// src/app/(post)/sqld/[slug]/page.tsx
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { sqldNotes } from "@/data/sqld/notes.data";
+import { NoteDetail } from "@/components/sqld/NoteDetail";
+
+type Params = { slug: string };
+
+interface SqldDetailPageProps {
+  params: Promise<Params>;
+}
+
+export function generateStaticParams(): Params[] {
+  return sqldNotes.map((note) => ({ slug: note.slug }));
+}
+
+export async function generateMetadata({
+  params,
+}: SqldDetailPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const note = sqldNotes.find((n) => n.slug === slug);
+  if (!note) return {};
+
+  return {
+    title: `${note.title} | SQLD 오답노트`,
+    description: note.concept.summary,
+  };
+}
+
+export default async function SqldDetailPage({ params }: SqldDetailPageProps) {
+  const { slug } = await params;
+
+  const note = sqldNotes.find((n) => n.slug === slug);
+
+  if (!note) {
+    notFound();
+  }
+
+  return (
+    <section className="space-y-4">
+      <NoteDetail note={note} />
+    </section>
+  );
+}
+
+
+
+// C:\workspace\mango-blog\src\components\common\Markdown.tsx
+// src/components/common/Markdown.tsx
+import React from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import rehypeRaw from "rehype-raw";
+
+interface MarkdownProps {
+  children: string;
+}
+
+export function Markdown({ children }: MarkdownProps) {
+  return (
+    <ReactMarkdown
+      remarkPlugins={[remarkGfm]}
+      rehypePlugins={[rehypeRaw]}
+      components={{
+        p: (props) => <p className="mb-2 leading-relaxed" {...props} />,
+        ul: (props) => (
+          <ul
+            className="mb-2 list-disc space-y-1 pl-5 text-slate-300"
+            {...props}
+          />
+        ),
+        li: (props) => <li className="leading-relaxed" {...props} />,
+        code: (props) => (
+          <code
+            className="rounded bg-slate-800 px-1 py-0.5 text-emerald-300"
+            {...props}
+          />
+        ),
+        strong: (props) => (
+          <strong className="text-slate-100 font-semibold" {...props} />
+        ),
+      }}
+    >
+      {children}
+    </ReactMarkdown>
+  );
+}
+
+
+
+// C:\workspace\mango-blog\src\components\sqld\NoteCard.tsx
+// components/sqld/NoteCard.tsx
+import Link from "next/link";
+import type { SqldNote } from "@/sqld/note.types";
+import { TagPill } from "./TagPill";
+
+interface NoteCardProps {
+  note: SqldNote;
+}
+
+export function NoteCard({ note }: NoteCardProps) {
+  return (
+    <article className="group rounded-xl border border-slate-800 bg-slate-900/40 p-4 transition hover:border-emerald-500/60 hover:bg-slate-900/80">
+      <header className="mb-2 flex items-center justify-between gap-2">
+        <h2 className="text-sm font-semibold text-slate-50">
+          <Link href={`/sqld/${note.slug}`}>
+            <span className="underline-offset-4 group-hover:underline">
+              {note.title}
+            </span>
+          </Link>
+        </h2>
+        <span className="text-xs text-slate-400">{note.category}</span>
+      </header>
+
+      <p className="mb-2 line-clamp-2 text-xs text-slate-300">
+        {note.concept.summary}
+      </p>
+
+      <div className="mb-2 flex flex-wrap gap-1">
+        {note.tags.map((tag) => (
+          <TagPill key={tag} label={tag} />
+        ))}
+      </div>
+
+      <footer className="flex items-center justify-between text-[11px] text-slate-500">
+        <span>
+          난이도 {note.meta.difficulty} / 중요도 {note.meta.importance}
+        </span>
+        {note.meta.nextReviewAt && (
+          <span>
+            다음 복습:{" "}
+            {new Date(note.meta.nextReviewAt).toLocaleDateString("ko-KR")}
+          </span>
+        )}
+      </footer>
+    </article>
+  );
+}
+
+
+
+// C:\workspace\mango-blog\src\components\sqld\NoteDetail.tsx
+// components/sqld/NoteDetail.tsx
+import type { SqldNote } from "@/sqld/note.types";
+import { TagPill } from "./TagPill";
+import { Markdown } from "@/components/common/Markdown";
+
+interface NoteDetailProps {
+  note: SqldNote;
+}
+
+export function NoteDetail({ note }: NoteDetailProps) {
+  return (
+    <article className="space-y-4">
+      <header className="space-y-2">
+        <div className="flex items-center justify-between">
+          <h1 className="text-xl font-semibold text-slate-50">{note.title}</h1>
+          <span className="text-xs text-slate-400">{note.category}</span>
+        </div>
+
+        <div className="flex flex-wrap gap-1">
+          {note.tags.map((tag) => (
+            <TagPill key={tag} label={tag} />
+          ))}
+        </div>
+
+        <div className="text-xs text-slate-500">
+          <span>
+            난이도 {note.meta.difficulty} / 중요도 {note.meta.importance}
+          </span>
+          {note.source?.examRound && (
+            <span className="ml-2">회차: {note.source.examRound}</span>
+          )}
+          {note.source?.material && (
+            <span className="ml-2">{note.source.material}</span>
+          )}
+        </div>
+      </header>
+
+      {note.question && (
+        <section className="rounded-lg border border-slate-800 bg-slate-900/60 p-3 text-sm">
+          <h2 className="mb-1 text-xs font-semibold text-slate-200">
+            틀렸던 문제
+          </h2>
+          <p className="mb-2 text-slate-100">{note.question.text}</p>
+          {note.question.options && (
+            <ul className="mb-2 list-disc space-y-1 pl-5 text-xs text-slate-300">
+              {note.question.options.map((opt, idx) => (
+                <li key={idx}>
+                  ({idx + 1}) {opt}
+                </li>
+              ))}
+            </ul>
+          )}
+          <p className="text-xs text-emerald-300">
+            정답: {note.question.correctAnswer ?? "—"}
+          </p>
+          {note.myAnswer && (
+            <p className="text-xs text-rose-300">내 답: {note.myAnswer}</p>
+          )}
+        </section>
+      )}
+
+      {note.mistakeReason && (
+        <section className="rounded-lg bg-slate-900/40 p-3 text-sm">
+          <h2 className="mb-1 text-xs font-semibold text-rose-300">
+            왜 틀렸는지
+          </h2>
+          <p className="text-slate-200">{note.mistakeReason}</p>
+        </section>
+      )}
+
+      <section className="rounded-lg bg-slate-900/40 p-3 text-sm">
+        <h2 className="mb-1 text-xs font-semibold text-emerald-300">
+          개념 정리
+        </h2>
+        <p className="mb-2 text-slate-50">{note.concept.summary}</p>
+        <section className="rounded-lg bg-slate-900/40 p-3 text-sm">
+          <h2 className="mb-1 text-xs font-semibold text-emerald-300">
+            개념 정리
+          </h2>
+          <p className="mb-2 text-slate-50">{note.concept.summary}</p>
+
+          <Markdown>{note.concept.explanation}</Markdown>
+
+          {note.concept.examples && (
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-xs text-slate-300">
+              {note.concept.examples.map((ex, idx) => (
+                <li key={idx}>{ex}</li>
+              ))}
+            </ul>
+          )}
+        </section>
+        {note.concept.examples && (
+          <ul className="mt-2 list-disc space-y-1 pl-5 text-xs text-slate-300">
+            {note.concept.examples.map((ex, idx) => (
+              <li key={idx}>{ex}</li>
+            ))}
+          </ul>
+        )}
+      </section>
+    </article>
+  );
+}
+
+
+
+// C:\workspace\mango-blog\src\components\sqld\NoteList.tsx
+// components/sqld/NoteList.tsx
+import type { SqldNote } from "@/sqld/note.types";
+import { NoteCard } from "./NoteCard";
+
+interface NoteListProps {
+  notes: SqldNote[];
+}
+
+export function NoteList({ notes }: NoteListProps) {
+  if (notes.length === 0) {
+    return (
+      <p className="text-sm text-slate-400">
+        조건에 맞는 오답노트가 없습니다. 필터를 조정해보세요.
+      </p>
+    );
+  }
+
+  return (
+    <div className="space-y-3">
+      {notes.map((note) => (
+        <NoteCard key={note.id} note={note} />
+      ))}
+    </div>
+  );
+}
+
+
+
+// C:\workspace\mango-blog\src\components\sqld\TagPill.tsx
+// components/sqld/TagPill.tsx
+interface TagPillProps {
+  label: string;
+}
+
+export function TagPill({ label }: TagPillProps) {
+  return (
+    <span className="rounded-full bg-slate-900/80 px-2.5 py-0.5 text-xs text-slate-200 ring-1 ring-slate-700/70">
+      {label}
+    </span>
+  );
+}
+
+
+
+// C:\workspace\mango-blog\src\data\sqld\notes.data.ts
+// data/sqld/notes.data.ts
+import type { SqldNote } from "@/sqld/note.types";
+
+export const sqldNotes: SqldNote[] = [
+  {
+    id: "2024-2-NORM-01",
+    slug: "normalization-3nf-vs-bcnf",
+    title: "제3정규형과 BCNF의 차이 정리",
+    category: "정규화",
+    tags: ["기출", "개념", "헷갈리는개념"],
+    source: {
+      examRound: "2024-2",
+      material: "공식 교재 3장 정규화",
+    },
+    question: {
+      text: "다음 중 BCNF에 대한 설명으로 옳지 않은 것은?",
+      options: [
+        "모든 결정자가 후보키인 정규형이다.",
+        "제3정규형보다 더 엄격한 정규형이다.",
+        "부분 함수 종속을 제거한다.",
+        "이행 함수 종속을 제거한다.",
+      ],
+      correctAnswer: "3",
+    },
+    myAnswer: "4",
+    mistakeReason:
+      '3NF와 BCNF의 차이를 애매하게 기억해서, 눈에 익은 문장인 "이행 함수 종속 제거"를 정답으로 착각함.',
+    concept: {
+      summary:
+        "BCNF는 모든 결정자가 후보키여야 하는, 3NF보다 더 강한 정규형이다.",
+      explanation: `
+- **3NF**: 기본키가 아닌 모든 속성이 기본키에만 완전 함수 종속이면 만족.
+- **BCNF**: 모든 결정자(Determinant)가 후보키여야 함.
+- 그래서 3NF는 만족하지만 BCNF는 만족하지 못하는 스키마가 존재할 수 있음.
+- 시험에서는 "모든 결정자가 후보키"라는 문장을 기억해두는 게 실전에서 가장 유용함.
+      `.trim(),
+      examples: ["교수-과목-강의실 예시에서 BCNF 분해 과정 1회 복습하기."],
+    },
+    meta: {
+      difficulty: 3,
+      importance: 5,
+      reviewCount: 1,
+      lastReviewedAt: "2025-11-12T10:30:00+09:00",
+      nextReviewAt: "2025-11-15T10:30:00+09:00",
+    },
+    createdAt: "2025-11-12T10:00:00+09:00",
+    updatedAt: "2025-11-12T10:30:00+09:00",
+  },
+];
+
+
+
+// C:\workspace\mango-blog\src\lib\sqld\note-filters.ts
+// lib/sqld/note-filters.ts
+import type { SqldNote, SqldCategory, SqldTag } from "@/sqld/note.types";
+
+export interface NoteFilter {
+  category?: SqldCategory | "ALL";
+  tag?: SqldTag | "ALL";
+  query?: string;
+}
+
+export function filterNotes(notes: SqldNote[], filter: NoteFilter): SqldNote[] {
+  return notes.filter((note) => {
+    if (filter.category && filter.category !== "ALL") {
+      if (note.category !== filter.category) return false;
+    }
+
+    if (filter.tag && filter.tag !== "ALL") {
+      if (!note.tags.includes(filter.tag)) return false;
+    }
+
+    if (filter.query && filter.query.trim()) {
+      const q = filter.query.trim().toLowerCase();
+      const haystack = [
+        note.title,
+        note.concept.summary,
+        note.concept.explanation,
+        note.mistakeReason ?? "",
+        note.category,
+        ...note.tags,
+      ]
+        .join(" ")
+        .toLowerCase();
+
+      if (!haystack.includes(q)) return false;
+    }
+
+    return true;
+  });
+}
+
+export function sortNotesByNextReview(notes: SqldNote[]): SqldNote[] {
+  return [...notes].sort((a, b) => {
+    const aTime = a.meta.nextReviewAt
+      ? new Date(a.meta.nextReviewAt).getTime()
+      : Number.POSITIVE_INFINITY;
+    const bTime = b.meta.nextReviewAt
+      ? new Date(b.meta.nextReviewAt).getTime()
+      : Number.POSITIVE_INFINITY;
+    return aTime - bTime;
+  });
+}
+
+
+
+// C:\workspace\mango-blog\src\sqld\note.types.ts
+// types/sqld/note.types.ts
+export type SqldCategory =
+  | "데이터모델링"
+  | "정규화"
+  | "조인"
+  | "인덱스"
+  | "트랜잭션"
+  | "성능튜닝"
+  | "SQL기본"
+  | "기타";
+
+export type SqldTag =
+  | "기출"
+  | "개념"
+  | "정의암기"
+  | "실수자주나옴"
+  | "헷갈리는개념"
+  | "함수"
+  | "튜닝포인트";
+
+export interface SqldNote {
+  id: string;
+  slug: string;
+  title: string;
+
+  category: SqldCategory;
+  tags: SqldTag[];
+
+  source?: {
+    examRound?: string;
+    material?: string;
+  };
+
+  question?: {
+    text: string;
+    options?: string[];
+    correctAnswer?: string;
+  };
+
+  myAnswer?: string;
+  mistakeReason?: string;
+
+  concept: {
+    summary: string;
+    explanation: string;
+    examples?: string[];
+  };
+
+  meta: {
+    difficulty: 1 | 2 | 3 | 4 | 5;
+    importance: 1 | 2 | 3 | 4 | 5;
+    reviewCount: number;
+    lastReviewedAt?: string;
+    nextReviewAt?: string;
+  };
+
+  createdAt: string;
+  updatedAt: string;
+}
+
+
+

@@ -1,0 +1,44 @@
+./
+├── README.md
+├── app
+│   ├── (post)
+│   │   └── sqld
+│   │       ├── [slug]
+│   │       │   └── page.tsx
+│   │       └── page.tsx
+│   ├── favicon.ico
+│   ├── globals.css
+│   ├── layout.tsx
+│   └── page.tsx
+├── components
+│   ├── layout
+│   └── sqld
+│       ├── NoteCard.tsx
+│       ├── NoteDetail.tsx
+│       ├── NoteList.tsx
+│       └── TagPill.tsx
+├── data
+│   └── sqld
+│       └── notes.data.ts
+├── eslint.config.mjs
+├── lib
+│   └── sqld
+│       └── note-filters.ts
+├── next-env.d.ts
+├── next.config.ts
+├── package.json
+├── pnpm-lock.yaml
+├── postcss.config.mjs
+├── public
+│   ├── file.svg
+│   ├── globe.svg
+│   ├── next.svg
+│   ├── vercel.svg
+│   └── window.svg
+├── tree.txt
+├── tsconfig.json
+└── types
+    └── sqld
+        └── note.types.ts
+
+15 directories, 27 files
