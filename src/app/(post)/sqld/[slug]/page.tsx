@@ -1,24 +1,32 @@
 // src/app/(post)/sqld/[slug]/page.tsx
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { sqldNotes } from "@/data/sqld/notes.data";
+import {
+  getAllSqldNotes,
+  getSqldNoteBySlug,
+  type SqldSlug,
+} from "@/data/sqld/notes.data";
 import { NoteDetail } from "@/components/sqld/NoteDetail";
 
-type Params = { slug: string };
+type Params = { slug: SqldSlug };
 
-interface SqldDetailPageProps {
+interface SqldPageProps {
   params: Promise<Params>;
 }
 
-export function generateStaticParams(): Params[] {
-  return sqldNotes.map((note) => ({ slug: note.slug }));
+// ✅ SSG용 정적 파라미터
+export async function generateStaticParams(): Promise<Params[]> {
+  const notes = getAllSqldNotes(); // note.slug: SqldSlug 로 좁혀짐
+  return notes.map((note) => ({ slug: note.slug }));
 }
 
+// ✅ 각 슬러그별 메타데이터
 export async function generateMetadata({
   params,
-}: SqldDetailPageProps): Promise<Metadata> {
+}: SqldPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const note = sqldNotes.find((n) => n.slug === slug);
+  const note = getSqldNoteBySlug(slug);
+
   if (!note) return {};
 
   return {
@@ -27,18 +35,18 @@ export async function generateMetadata({
   };
 }
 
-export default async function SqldDetailPage({ params }: SqldDetailPageProps) {
+// ✅ 실제 페이지
+export default async function SqldNotePage({ params }: SqldPageProps) {
   const { slug } = await params;
-
-  const note = sqldNotes.find((n) => n.slug === slug);
+  const note = getSqldNoteBySlug(slug);
 
   if (!note) {
     notFound();
   }
 
   return (
-    <section className="space-y-4">
+    <main className="mx-auto max-w-4xl px-4 pb-24 pt-4">
       <NoteDetail note={note} />
-    </section>
+    </main>
   );
 }

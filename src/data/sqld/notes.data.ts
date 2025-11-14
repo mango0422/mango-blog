@@ -1,13 +1,14 @@
 // data/sqld/notes.data.ts
 import type { SqldNote } from "@/sqld/note.types";
 
-export const sqldNotes: SqldNote[] = [
+export const sqldNotes = [
   {
     id: "2024-2-NORM-01",
     slug: "normalization-3nf-vs-bcnf",
     title: "제3정규형과 BCNF의 차이 정리",
     category: "정규화",
     tags: ["기출", "개념", "헷갈리는개념"],
+    type: "sqld-note",
     layout: "note",
     source: {
       examRound: "2024-2",
@@ -47,4 +48,16 @@ export const sqldNotes: SqldNote[] = [
     createdAt: "2025-11-12T10:00:00+09:00",
     updatedAt: "2025-11-12T10:30:00+09:00",
   },
-];
+] as const satisfies SqldNote[];
+
+// ✅ slug literal 타입 추출
+export type SqldSlug = (typeof sqldNotes)[number]["slug"];
+
+// ✅ 유틸 함수들
+export function getAllSqldNotes(): (typeof sqldNotes)[number][] {
+  return sqldNotes.slice();
+}
+
+export function getSqldNoteBySlug(slug: SqldSlug): SqldNote | undefined {
+  return sqldNotes.find((note) => note.slug === slug);
+}

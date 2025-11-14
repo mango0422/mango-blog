@@ -2,6 +2,7 @@
 import Link from "next/link";
 import type { SqldNote } from "@/sqld/note.types";
 import { TagPill } from "./TagPill";
+import { Card } from "../common/Card";
 
 interface NoteCardProps {
   note: SqldNote;
@@ -9,7 +10,7 @@ interface NoteCardProps {
 
 export function NoteCard({ note }: NoteCardProps) {
   return (
-    <article className="group rounded-xl border border-slate-800 bg-slate-900/40 p-4 transition hover:border-emerald-500/60 hover:bg-slate-900/80">
+    <Card>
       <header className="mb-2 flex items-center justify-between gap-2">
         <h2 className="text-sm font-semibold text-slate-50">
           <Link href={`/sqld/${note.slug}`}>
@@ -42,6 +43,6 @@ export function NoteCard({ note }: NoteCardProps) {
           </span>
         )}
       </footer>
-    </article>
+    </Card>
   );
 }
