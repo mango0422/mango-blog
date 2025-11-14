@@ -49,6 +49,17 @@ export const blogPostMetaList: BlogPostMeta[] = [
     updatedAt: "2025-11-13T11:42:00+09:00",
     excerpt: "WHERE, GROUP BY, 고급 SQL 문법 정리.",
   },
+  {
+    id: "sqld-subway-30min-memo",
+    slug: "sqld-subway-30min-memo",
+    title: "SQLD 벼락치기 — 지하철 30분 암기형 요약 + 설명",
+    category: "sqld",
+    tags: ["벼락치기", "정규화", "JOIN", "집합연산", "함수"],
+    createdAt: "2025-11-14T11:40:00+09:00",
+    updatedAt: "2025-11-14T11:40:00+09:00",
+    excerpt:
+      "정규화·키·JOIN·집합연산·핵심 함수 10개를 지하철 30분 동안 반복 암기할 수 있도록 압축 정리한 SQLD 벼락치기 노트.",
+  },
 ] as const satisfies BlogPostMeta[];
 
 export type BlogSlug = (typeof blogPostMetaList)[number]["slug"];
