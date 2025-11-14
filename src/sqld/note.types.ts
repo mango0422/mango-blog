@@ -7,6 +7,10 @@ import type {
   SourceInfo,
 } from "@/types/content";
 
+export type SqldCategory = "정규화" | "모델링" | "함수" | "SQL기본" | "기타";
+
+export type SqldTag = string;
+
 export interface SqldNoteConcept {
   summary: string;
   explanation: string;
@@ -31,6 +35,11 @@ export interface SqldNoteMeta {
 export interface SqldNote extends BaseContentMeta {
   type: "sqld-note";
   layout?: LayoutType;
+
+  // 여기서 좁혀주면 BaseContentMeta.category: string 보다 더 구체적으로 사용 가능
+  category: SqldCategory;
+  tags: SqldTag[];
+
   concept: SqldNoteConcept;
   source?: SourceInfo;
   question?: SqldNoteQuestion;
