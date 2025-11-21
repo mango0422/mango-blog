@@ -56,6 +56,7 @@ export default async function RootLayout({
                 target="_blank"
                 rel="noreferrer"
                 className="hover:text-primary-500 transition-colors font-cute"
+                aria-label={`${key} 페이지로 이동`}
               >
                 {item.title}
               </Link>
@@ -70,6 +71,7 @@ export default async function RootLayout({
                 key={safeRoute}
                 href={safeRoute}
                 className="hover:text-primary-500 transition-colors font-cute"
+                aria-label={`${safeRoute} 페이지로 이동`}
               >
                 {item.title}
               </Link>

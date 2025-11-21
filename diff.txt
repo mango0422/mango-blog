@@ -1,0 +1,157 @@
+diff --git a/global.d.ts b/global.d.ts
+index c69344a..abf4a0b 100644
+--- a/global.d.ts
++++ b/global.d.ts
+@@ -1,2 +1,61 @@
+ // global.d.ts
++
++declare module "nextra/pages" {
++  import type { ComponentType, ReactElement } from "react";
++  import type { Heading as MdastHeading } from "mdast";
++  import type { Metadata } from "next";
++
++  /** Nextra가 사용하는 목차(Heading) 타입 */
++  export type Heading = {
++    // H1은 제외
++    depth: Exclude<MdastHeading["depth"], 1>;
++    value: string | ReactElement;
++    id: string;
++  };
++
++  export type ReadingTime = {
++    text: string;
++    minutes: number;
++    time: number;
++    words: number;
++  };
++
++  /** Nextra의 $NextraMetadata */
++  export type NextraMetadata = Omit<Metadata, "title"> & {
++    title: string;
++    filePath: string;
++    timestamp?: number;
++    readingTime?: ReadingTime;
++  };
++
++  /** Nextra의 EvaluateResult (any 제거 버전) */
++  export interface EvaluateResult {
++    /** 렌더링할 MDX 컴포넌트 */
++    default: ComponentType<Record<string, unknown>>;
++    /** 목차 리스트 */
++    toc: Heading[];
++    /** front matter/metadata */
++    metadata: NextraMetadata;
++    /** 원본 MDX 소스 */
++    sourceCode: string;
++  }
++
++  /**
++   * content 디렉터리에서 MDX/Markdown 페이지를 불러옴
++   */
++  export function importPage(
++    pathSegments?: string[],
++    lang?: string
++  ): Promise<EvaluateResult>;
++
++  /**
++   * Next.js generateStaticParams용 헬퍼
++   */
++  export function generateStaticParamsFor(
++    segmentKey: string,
++    localeSegmentKey?: string
++  ): () => Promise<Array<Record<string, string | string[]>>>;
++}
++
++// CSS import용 선언
+ declare module "*.css";
+diff --git a/package.json b/package.json
+index 9b0edce..7ddcd60 100644
+--- a/package.json
++++ b/package.json
+@@ -25,6 +25,7 @@
+   },
+   "devDependencies": {
+     "@tailwindcss/postcss": "4.1.17",
++    "@types/mdast": "^4.0.4",
+     "@types/node": "20.19.25",
+     "@types/react": "19.2.6",
+     "@types/react-dom": "19.2.3",
+diff --git a/pnpm-lock.yaml b/pnpm-lock.yaml
+index 70e3e4a..05788b1 100644
+--- a/pnpm-lock.yaml
++++ b/pnpm-lock.yaml
+@@ -48,6 +48,9 @@ importers:
+       '@tailwindcss/postcss':
+         specifier: 4.1.17
+         version: 4.1.17
++      '@types/mdast':
++        specifier: ^4.0.4
++        version: 4.0.4
+       '@types/node':
+         specifier: 20.19.25
+         version: 20.19.25
+diff --git a/src/app/[[...mdxPath]]/page.tsx b/src/app/[[...mdxPath]]/page.tsx
+index a6d85b1..19577dc 100644
+--- a/src/app/[[...mdxPath]]/page.tsx
++++ b/src/app/[[...mdxPath]]/page.tsx
+@@ -1,5 +1,6 @@
+ // src/app/[[...mdxPath]]/page.tsx
+ import { generateStaticParamsFor, importPage } from "nextra/pages";
++import type { Heading, NextraMetadata } from "nextra/pages";
+ import type { ReactNode, ComponentType } from "react";
+ import { useMDXComponents as getMDXComponents } from "../../mdx-components";
+ 
+@@ -19,22 +20,19 @@ export async function generateMetadata(props: PageProps) {
+   return metadata;
+ }
+ 
++type WrapperProps = {
++  children?: ReactNode;
++  toc?: Heading[]; // global.d.ts에서 가져온 타입
++  metadata?: NextraMetadata;
++  sourceCode?: string;
++};
++
+ // 1) 컴포넌트 한 번 받아오고
+ const components = getMDXComponents();
+ 
+-// 2) wrapper 없으면 fallback 컴포넌트 사용
+-const Wrapper: ComponentType<{
+-  children?: ReactNode;
+-  toc?: unknown;
+-  metadata?: unknown;
+-  sourceCode?: unknown;
+-}> =
+-  (components.wrapper as ComponentType<{
+-    children?: ReactNode;
+-    toc?: unknown;
+-    metadata?: unknown;
+-    sourceCode?: unknown;
+-  }>) ?? (({ children }) => <>{children}</>);
++const Wrapper: ComponentType<WrapperProps> =
++  (components.wrapper as ComponentType<WrapperProps>) ??
++  (({ children }) => <>{children}</>);
+ 
+ export default async function Page(props: PageProps) {
+   const params = await props.params;
+diff --git a/tsconfig.json b/tsconfig.json
+index 198df50..18bdcf4 100644
+--- a/tsconfig.json
++++ b/tsconfig.json
+@@ -8,7 +8,7 @@
+     "noEmit": true,
+     "esModuleInterop": true,
+     "module": "esnext",
+-    // "moduleResolution": "bundler",
++    "moduleResolution": "bundler",
+     "resolveJsonModule": true,
+     "isolatedModules": true,
+     "jsx": "react-jsx",
+@@ -23,6 +23,7 @@
+     }
+   },
+   "include": [
++    "global.d.ts",
+     "next-env.d.ts",
+     "**/*.ts",
+     "**/*.tsx",

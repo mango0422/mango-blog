@@ -30,24 +30,25 @@
   --nextra-sidebar-bg: var(--color-mango-bg) !important;
 }
 
-/* 3. 다크모드 기본 텍스트 밝기 올리기 */
+/* 다크모드 수정: 텍스트 가독성을 위해 밝기를 올림 */
 .dark body {
-  color: oklch(0.9 0.02 260); /* 거의 흰색에 가까운 연보라/회색 계열 */
+  /* 기존 0.9 -> 0.94 로 상향 조정 (더 밝게) */
+  color: oklch(0.94 0.02 260);
 }
 
-/* Nextra가 내부에서 쓰는 회색 텍스트들 밝게 통일 */
+/* 보조 텍스트들도 명도 대비를 높입니다 */
 .dark .nx-text-gray-400,
 .dark .nx-text-slate-400,
 .dark .nx-text-neutral-400 {
-  /* → 본문 보조 텍스트 정도 느낌 */
-  color: oklch(0.8 0.03 260) !important;
+  /* 기존 0.8 -> 0.85 */
+  color: oklch(0.85 0.03 260) !important;
 }
 
 .dark .nx-text-gray-500,
 .dark .nx-text-slate-500,
 .dark .nx-text-neutral-500 {
-  /* → 지금 너무 어두운 애들. 한 단계 밝게 끌어올리기 */
-  color: oklch(0.86 0.03 260) !important;
+  /* 기존 0.86 -> 0.90 */
+  color: oklch(0.9 0.03 260) !important;
 }
 
 /* 사이드바/네비게이션 항목도 더 선명하게 */
