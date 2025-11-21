@@ -5,17 +5,17 @@ import localFont from "next/font/local";
 export const cuteFont = localFont({
   src: [
     {
-      path: "../fonts/CookieRun-Regular.otf",
+      path: "../fonts/CookieRun-Regular.woff2",
       weight: "400",
       style: "normal",
     },
     {
-      path: "../fonts/CookieRun-Bold.otf",
+      path: "../fonts/CookieRun-Bold.woff2",
       weight: "700",
       style: "normal",
     },
     {
-      path: "../fonts/CookieRun-Black.otf",
+      path: "../fonts/CookieRun-Black.woff2",
       weight: "900",
       style: "normal",
     },
@@ -28,17 +28,17 @@ export const cuteFont = localFont({
 export const sansFont = localFont({
   src: [
     {
-      path: "../fonts/CookieRun-Regular.otf",
+      path: "../fonts/CookieRun-Regular.woff2",
       weight: "400",
       style: "normal",
     },
     {
-      path: "../fonts/CookieRun-Bold.otf",
+      path: "../fonts/CookieRun-Bold.woff2",
       weight: "700",
       style: "normal",
     },
     {
-      path: "../fonts/CookieRun-Black.otf",
+      path: "../fonts/CookieRun-Black.woff2",
       weight: "900",
       style: "normal",
     },

@@ -108,13 +108,15 @@ export default async function RootLayout({
           navbar={navbar}
           footer={footer}
           toc={{
+            // ✅ <p> 안에 들어갈 것이라 "인라인 요소"만 사용
             title: (
-              <div className="nx-flex nx-items-center nx-justify-between nx-gap-2">
+              <>
                 <span className="nx-text-xs nx-font-semibold nx-uppercase nx-tracking-wide font-cute">
                   On This Page
                 </span>
-                <ThemeSwitch />
-              </div>
+                {/* 필요하면 여기에 간격용 공백 정도는 추가 가능 */}
+                <ThemeSwitch className="nx-ml-2" />
+              </>
             ),
           }}
         >

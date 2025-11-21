@@ -1,0 +1,41 @@
+---
+title: 버블 정렬 (Bubble Sort)
+
+description: 인접한 두 원소를 비교하여 정렬하는 가장 기본적인 알고리즘입니다.
+---
+
+# 버블 정렬 (Bubble Sort)
+
+## 개념 [#concept]
+
+서로 인접한 두 원소를 검사하여 정렬하는 알고리즘입니다. 구현이 쉽지만 ~~매우 비효율적~~이라 실제로는 잘 쓰이지 않습니다.
+
+<Callout type="info" title="핵심 로직">
+
+1회전 할 때마다 **가장 큰 값이 맨 뒤로** 이동하여 확정됩니다.
+
+</Callout>
+
+## 구현 코드 [#implementation]
+
+```java filename="BubbleSort.java"
+
+public void bubbleSort(int[] arr) {
+
+    int n = arr.length;
+    for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n - i - 1; j++) {
+                        if (arr[j] > arr[j + 1]) {
+                                // Swap
+                int temp = arr[j];
+                arr[j] = arr[j + 1];
+                arr[j + 1] = temp;
+                }
+            }
+        }
+    }
+```
+
+복잡도 분석 [#complexity]
+
+구분복잡도설명시간 복잡도$O(n^2)$중첩 루프를 사용하기 때문공간 복잡도$O(1)$제자리 정렬 (In-place sort)

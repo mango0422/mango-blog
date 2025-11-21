@@ -1,0 +1,47 @@
+---
+title: ArrayList
+description: Java의 동적 배열인 ArrayList의 특징과 사용법을 알아봅니다.
+---
+
+# ArrayList
+
+배열(`Array`)과 다르게 크기가 가변적으로 변하는 선형 리스트입니다.
+
+## 특징 요약 [#features]
+
+### 장점 (Pros)
+
+- [x] **인덱스 기반 접근**: `get(i)` 호출 시 $O(1)$의 시간 복잡도를 가집니다.
+- [x] **순차 데이터 추가**: 리스트 끝에 데이터를 추가할 때 빠릅니다.
+
+### 단점 (Cons)
+
+- [ ] **중간 삽입/삭제**: 데이터를 밀거나 당겨야 하므로 $O(n)$이 소요됩니다.
+- [ ] **크기 재조정**: 용량이 꽉 차면 새로운 배열을 만들고 복사하는 비용이 듭니다.
+
+## 사용 예제 [#usage-example]
+
+`ArrayList`의 기본적인 CRUD 예제입니다.
+
+```java filename="ArrayListExample.java"
+import java.util.ArrayList;
+import java.util.List;
+
+public class Main {
+    public static void main(String[] args) {
+        // 생성
+        List<String> fruits = new ArrayList<>();
+
+        // 추가
+        fruits.add("Apple");
+        fruits.add("Banana");
+        fruits.add("Mango");
+
+        // 조회 (인덱스)
+        String myFruit = fruits.get(2); // "Mango"
+
+        // 삭제
+        fruits.remove(0); // "Apple" 삭제 후 인덱스 이동
+    }
+}
+```
