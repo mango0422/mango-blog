@@ -1,0 +1,9 @@
+{
+  "index": "알고리즘 개요",
+  "complexity": "시간·공간 복잡도",
+  "sorting": "정렬 알고리즘 (Java 구현)",
+  "searching": "탐색 알고리즘 (선형/이진 등)",
+  "recursion-backtracking": "재귀 & 백트래킹",
+  "graph-traversal": "그래프 탐색 (BFS/DFS)",
+  "dp-greedy": "동적 계획법 & 그리디"
+}

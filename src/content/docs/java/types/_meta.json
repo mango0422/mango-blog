@@ -1,0 +1,9 @@
+{
+  "index": "타입 전체 개요",
+  "primitives": "기본 타입 (Primitive 8개)",
+  "wrappers": "Wrapper 클래스 & 박싱",
+  "string-and-char": "String / char / 문자열 처리",
+  "arrays": "배열(Array) & Arrays 유틸",
+  "number-bigdecimal": "정밀 숫자(BigDecimal/BigInteger)",
+  "object-and-common-utils": "Object & 공통 유틸 메서드"
+}

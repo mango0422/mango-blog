@@ -1,0 +1,26 @@
+{
+  "index": {
+    "title": "홈",
+    "display": "hidden"
+  },
+  "docs": {
+    "title": "Docs",
+    "type": "page"
+  },
+  "posts": {
+    "title": "Blog",
+    "type": "page"
+  },
+  "til": {
+    "title": "TIL",
+    "type": "page"
+  },
+  "projects": {
+    "title": "Projects",
+    "type": "page"
+  },
+  "java": {
+    "title": "Java17 · 타입·자료구조·알고리즘",
+    "type": "page"
+  }
+}

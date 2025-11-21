@@ -1,26 +1,103 @@
+/* app/globals.css */
 @import "tailwindcss";
+@import "nextra-theme-docs/style.css";
+@import "nextra-theme-blog/style.css";
 
+/* 1. Tailwind v4 테마 정의 (망고 블로그) */
+@theme {
+  /* 폰트 변수 (layout.tsx에서 주입됨) */
+  --font-cute: var(--font-cute);
+  --font-sans: var(--font-sans);
+
+  /* 망고 컬러 팔레트 */
+  --color-mango-bg: oklch(0.18 0.03 260);
+  --color-mango-card: oklch(0.22 0.03 260);
+  --color-mango-accent: oklch(0.78 0.16 280);
+}
+
+/* 2. Nextra CSS 변수 오버라이딩 (디자인 장악) */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --nextra-primary-hue: 280deg;
+  --nextra-primary-saturation: 80%;
+
+  /* 폰트 적용: Nextra 기본 폰트도 CookieRun으로 */
+  --nextra-font-sans: var(--font-sans);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* 다크모드 강제 색상 */
+.dark {
+  --nextra-bg: var(--color-mango-bg) !important;
+  --nextra-sidebar-bg: var(--color-mango-bg) !important;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* 3. 다크모드 기본 텍스트 밝기 올리기 */
+.dark body {
+  color: oklch(0.9 0.02 260); /* 거의 흰색에 가까운 연보라/회색 계열 */
 }
 
+/* Nextra가 내부에서 쓰는 회색 텍스트들 밝게 통일 */
+.dark .nx-text-gray-400,
+.dark .nx-text-slate-400,
+.dark .nx-text-neutral-400 {
+  /* → 본문 보조 텍스트 정도 느낌 */
+  color: oklch(0.8 0.03 260) !important;
+}
+
+.dark .nx-text-gray-500,
+.dark .nx-text-slate-500,
+.dark .nx-text-neutral-500 {
+  /* → 지금 너무 어두운 애들. 한 단계 밝게 끌어올리기 */
+  color: oklch(0.86 0.03 260) !important;
+}
+
+/* 사이드바/네비게이션 항목도 더 선명하게 */
+.dark .nextra-sidebar .nx-text-sm,
+.dark .nextra-sidebar .nx-text-xs {
+  color: oklch(0.9 0.02 260) !important;
+}
+
+/* 푸터처럼 '회색 설명글'이 많은 곳도 전체 상향 */
+.dark footer,
+.dark .nextra-footer {
+  color: oklch(0.84 0.02 260);
+}
+
+/* 다크모드일 때 사이드바/메뉴 텍스트 더 밝게 */
+.dark .nextra-sidebar-item,
+.dark .nextra-sidebar-item a,
+.dark .nextra-menu,
+.dark .nextra-menu a {
+  color: oklch(0.85 0.03 280) !important; /* 밝은 보라빛 회색 */
+}
+
+/* 활성 메뉴/호버 시는 더 밝게 */
+.dark .nextra-sidebar-item a:hover,
+.dark .nextra-sidebar-item[data-active="true"] a,
+.dark .nextra-sidebar-link:is([data-active="true"], :hover) {
+  color: oklch(0.97 0.02 280) !important;
+}
+
+/* 섹션 제목(예: "Posts", "Til")도 같이 밝게 */
+.dark .nextra-sidebar-title,
+.dark .nextra-menu-header {
+  color: oklch(0.8 0.03 280) !important;
+}
+
+/* 제목 폰트 교체 (귀여운 폰트) */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.nextra-search-input,
+.nextra-nav-link,
+.nextra-sidebar-item {
+  font-family: var(--font-cute) !important;
+  letter-spacing: 0.03em;
+}
+
+/* 본문 폰트 (가독성) */
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
 }
