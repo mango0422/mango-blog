@@ -3,7 +3,7 @@ import type { MDXComponents } from "nextra/mdx-components";
 import { useMDXComponents as getThemeComponents } from "nextra-theme-docs";
 import { Callout } from "@/components/mdx/Callout";
 
-const themeComponents = getThemeComponents({} as MDXComponents);
+const themeComponents = getThemeComponents();
 
 export function useMDXComponents(
   components: MDXComponents = {} as MDXComponents
