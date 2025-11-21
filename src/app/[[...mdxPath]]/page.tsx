@@ -1,5 +1,6 @@
 // src/app/[[...mdxPath]]/page.tsx
 import { generateStaticParamsFor, importPage } from "nextra/pages";
+import type { Heading, NextraMetadata } from "nextra/pages";
 import type { ReactNode, ComponentType } from "react";
 import { useMDXComponents as getMDXComponents } from "../../mdx-components";
 
@@ -19,22 +20,19 @@ export async function generateMetadata(props: PageProps) {
   return metadata;
 }
 
+type WrapperProps = {
+  children?: ReactNode;
+  toc?: Heading[]; // global.d.ts에서 가져온 타입
+  metadata?: NextraMetadata;
+  sourceCode?: string;
+};
+
 // 1) 컴포넌트 한 번 받아오고
 const components = getMDXComponents();
 
-// 2) wrapper 없으면 fallback 컴포넌트 사용
-const Wrapper: ComponentType<{
-  children?: ReactNode;
-  toc?: unknown;
-  metadata?: unknown;
-  sourceCode?: unknown;
-}> =
-  (components.wrapper as ComponentType<{
-    children?: ReactNode;
-    toc?: unknown;
-    metadata?: unknown;
-    sourceCode?: unknown;
-  }>) ?? (({ children }) => <>{children}</>);
+const Wrapper: ComponentType<WrapperProps> =
+  (components.wrapper as ComponentType<WrapperProps>) ??
+  (({ children }) => <>{children}</>);
 
 export default async function Page(props: PageProps) {
   const params = await props.params;
