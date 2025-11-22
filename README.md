@@ -42,7 +42,7 @@ pnpm install
 npm run dev
 ```
 
-브라우저에서 [http://localhost:3000](https://www.google.com/search?q=http://localhost:3000)을 열어 확인합니다.
+브라우저에서 [http://localhost:3000](http://localhost:3000)을 열어 확인합니다.
 
 ### 3\. 빌드 및 검색 인덱싱 (Build)
 
@@ -75,7 +75,7 @@ mango-blog/
 
 새로운 글이나 문서를 작성하는 방법, MDX 문법, 주의 사항은 별도 가이드 문서를 참고하세요.
 
-👉 **[HOW-TO-WRITE-MDX.md](https://www.google.com/search?q=./HOW-TO-WRITE-MDX.md) 보러가기**
+👉 **[HOW-TO-WRITE-MDX.md](./HOW-TO-WRITE-MDX.md) 보러가기**
 
 ### 빠른 요약
 
@@ -99,7 +99,3 @@ date: 2025-11-22
 ## 📄 라이선스 (License)
 
 MIT License © 2025 Mango
-
-```
-
-```
