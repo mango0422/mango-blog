@@ -1,7 +1,7 @@
 /* app/globals.css */
 @import "tailwindcss";
 @import "nextra-theme-docs/style.css";
-@import "nextra-theme-blog/style.css";
+/* @import "nextra-theme-blog/style.css"; */
 
 /* 1. Tailwind v4 테마 정의 (망고 블로그) */
 @theme {
@@ -22,6 +22,14 @@
 
   /* 폰트 적용: Nextra 기본 폰트도 CookieRun으로 */
   --nextra-font-sans: var(--font-sans);
+
+  --nextra-bg: #ffffff;
+}
+
+/* 전체 페이지 기본 배경 */
+html,
+body {
+  background-color: var(--color-mango-bg);
 }
 
 /* 다크모드 강제 색상 */
@@ -84,6 +92,13 @@
   color: oklch(0.8 0.03 280) !important;
 }
 
+.dark main,
+.dark .nextra-content,
+.dark .nextra-layout {
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
 /* 제목 폰트 교체 (귀여운 폰트) */
 h1,
 h2,
@@ -101,4 +116,34 @@ h6,
 /* 본문 폰트 (가독성) */
 body {
   font-family: var(--font-sans);
+}
+
+/* 데스크톱: 왼쪽 사이드바 오버레이/패널 */
+@media (min-width: 1025px) {
+  .nextra-sidebar-container {
+    background-color: rgba(0, 0, 0, 0.55);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+  }
+
+  .nextra-sidebar {
+    background-color: var(--color-mango-bg);
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+  }
+}
+
+/* 모바일: 햄버거 메뉴 오버레이/패널 */
+@media (max-width: 1024px) {
+  .nextra-mobile-nav {
+    background-color: rgba(0, 0, 0, 0.55) !important;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+  }
+
+  .nextra-mobile-nav > div,
+  .nextra-mobile-nav > ul {
+    background-color: var(--color-mango-bg);
+    border-radius: 0.75rem;
+    margin: 0.75rem;
+  }
 }

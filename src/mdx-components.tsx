@@ -1,7 +1,11 @@
 // src/mdx-components.tsx
 import type { MDXComponents } from "nextra/mdx-components";
 import { useMDXComponents as getThemeComponents } from "nextra-theme-docs";
+import { Steps, Tabs, FileTree } from "nextra/components";
 import { Callout } from "@/components/mdx/Callout";
+import { Solution } from "@/components/mdx/Solution";
+import { Complexity } from "@/components/mdx/Complexity";
+import { JavaDoc } from "@/components/mdx/JavaDoc";
 
 const themeComponents = getThemeComponents();
 
@@ -11,7 +15,13 @@ export function useMDXComponents(
   return {
     ...themeComponents,
 
-    Callout, // <- MDX에서 <Callout> 사용 가능
+    Callout,
+    Steps,
+    Tabs,
+    FileTree,
+    Solution,
+    Complexity,
+    JavaDoc,
 
     ...components,
   };
