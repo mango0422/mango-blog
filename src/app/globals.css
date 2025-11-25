@@ -147,3 +147,15 @@ body {
     margin: 0.75rem;
   }
 }
+
+/* 코드 블럭: 내용 길이만큼만 보이도록 (shrink-to-fit) */
+.nextra-code-block {
+  display: inline-block; /* 인라인 블럭 → 내용 크기 기준 */
+  width: auto !important; /* w-full 덮어쓰기 (중요) */
+  max-width: 100%; /* 너무 길면 부모 폭까지만 */
+}
+
+/* 안쪽 pre가 있다면: 가로 스크롤 허용만 유지 */
+.nextra-code-block pre {
+  overflow-x: auto;
+}

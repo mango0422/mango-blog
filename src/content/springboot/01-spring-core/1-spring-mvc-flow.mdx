@@ -1,0 +1,241 @@
+---
+title: Spring MVC 전체 흐름
+description: DispatcherServlet 중심의 요청 처리 단계별 구조 정리
+date: 2025-11-25
+tags:
+  - spring
+  - mvc
+  - web
+---
+
+# Spring MVC 전체 흐름
+
+Spring MVC는 **요청(Request)** 이 들어온 순간부터  
+**응답(Response)** 이 반환될 때까지명확한 파이프라인으로 동작한다.  
+이 문서는 DispatcherServlet을 중심으로 전체 흐름을 단계별로 정리한다.
+
+---
+
+## 1. 전체 아키텍처 개요
+
+Spring MVC는 크게 아래 구성 요소가 협력하며 작동한다.
+
+- **DispatcherServlet** (프론트 컨트롤러)
+- **HandlerMapping**
+- **HandlerAdapter**
+- **Controller** (핸들러)
+- **ArgumentResolver** / **ReturnValueHandler**
+- **ViewResolver** (또는 JSON 변환기)
+- **Filter / Interceptor**
+
+전체 요청 흐름은 아래와 같다.
+
+<CodeLayout inner="center">
+
+```
+HTTP Request
+   ↓
+[Filter Chain]
+   ↓
+DispatcherServlet
+   ↓
+HandlerMapping → HandlerAdapter
+   ↓
+Controller (핸들러 실행)
+   ↓
+ReturnValueHandler
+   ↓
+ViewResolver / HttpMessageConverter
+   ↓
+HTTP Response
+```
+
+</CodeLayout>
+
+---
+
+## 2. Filter → Interceptor → Controller 실행 순서
+
+### 2.1 Filter (서블릿 레벨)
+
+- WAS(Tomcat)가 Servlet 실행 전에 호출
+- 인증/인가, 로깅, CORS 등에 사용
+- Spring 외부 기술 (Jakarta Servlet)
+
+### 2.2 Interceptor (스프링 레벨)
+
+- Spring MVC 내부에서 동작
+- `preHandle`, `postHandle`, `afterCompletion` 제공
+- 인증 체크, 공통 로깅, locale 처리 등에 사용
+
+### 실행 순서
+
+<CodeLayout>
+
+```
+Filter → Interceptor(pre) → Controller → Interceptor(post) → Interceptor(after) → Filter
+```
+
+</CodeLayout>
+
+---
+
+## 3. DispatcherServlet 요청 처리 단계
+
+DispatcherServlet은 Spring MVC의 **프론트 컨트롤러**로,  
+모든 요청을 단일 진입점에서 처리한다.
+
+### Step 1. 요청 수신
+
+- 모든 요청이 DispatcherServlet으로 들어온다 (web.xml / 자동 설정)
+
+### Step 2. HandlerMapping 탐색
+
+- 요청 URL과 매핑된 **Controller 메서드**를 찾는다.
+- 대표적인 구현체:
+
+  - `RequestMappingHandlerMapping` → `@RequestMapping` 기반
+
+### Step 3. HandlerAdapter 선택
+
+- 해당 핸들러(Controller)를 실행할 수 있는 Adapter 선택
+- `RequestMappingHandlerAdapter`가 대표적
+
+### Step 4. 핸들러(Controller) 실행
+
+- 컨트롤러 메서드 호출
+- 이 과정에서 **ArgumentResolver**가 파라미터를 주입한다.
+
+예: `@RequestParam`, `@PathVariable`, `@RequestBody`, `HttpServletRequest`, DTO
+
+### Step 5. 반환값 처리
+
+- **ReturnValueHandler**가 Controller 결과를 분석해 후처리
+- @ResponseBody이면 → HttpMessageConverter 사용(JSON 직렬화)
+- ModelAndView이면 → ViewResolver 수행
+
+### Step 6. ViewResolver / HttpMessageConverter
+
+- API 서버의 경우 99%는 **JSON 변환기**가 사용됨
+- 템플릿 엔진 Thymeleaf의 경우 ViewResolver가 렌더링
+
+### Step 7. 최종 Response 반환
+
+- JSON, HTML, 파일 등으로 변환되어 클라이언트에 응답됨
+
+---
+
+## 4. ArgumentResolver
+
+스프링이 컨트롤러 메서드에 "알아서 파라미터를 넣어주는" 핵심 기술.
+
+예시:
+
+<CodeLayout>
+```java
+@GetMapping("/hello/{id}")
+public UserDto hello(@PathVariable Long id,
+                     @RequestParam String name,
+                     HttpServletRequest req,
+                     @RequestBody CreateDto body) {...}
+```
+</CodeLayout>
+
+이 모든 파라미터는 ArgumentResolver가 자동 변환하여 주입한다.
+
+주요 ArgumentResolver:
+
+- `PathVariableMethodArgumentResolver`
+- `RequestParamMethodArgumentResolver`
+- `RequestResponseBodyMethodProcessor` (JSON → 객체)
+
+---
+
+## 5. ReturnValueHandler
+
+Controller가 반환한 값을 "어떻게 응답으로 만들지" 결정한다.
+
+예:
+
+- `String` 반환 → View 이름으로 처리
+- `ModelAndView` → 명시적 View
+- `@ResponseBody` → JSON 직렬화
+
+스프링 부트 웹 API에서
+
+<CodeLayout>
+```java
+@GetMapping("/api/user")
+public UserResponse getUser() {
+    return new UserResponse("mango", 20);
+}
+```
+</CodeLayout>
+
+→ 자동으로 JSON으로 변환됨
+
+---
+
+## 6. HttpMessageConverter (JSON 직렬화)
+
+API 서버의 핵심 구성 요소.
+
+- JSON ↔ Java 객체 변환 담당
+- 기본 구현: `MappingJackson2HttpMessageConverter`
+- `@ResponseBody` 또는 `@RestController`에서 자동 적용
+
+동작 순서:
+
+1. 객체 반환
+2. HttpMessageConverter가 JSON으로 변환
+3. Content-Type: application/json 설정
+4. 응답 출력
+
+---
+
+## 7. ViewResolver (템플릿 엔진 사용 시)
+
+Thymeleaf, JSP 등을 사용할 때만 작동.
+REST API 구성에서는 보통 사용하지 않음.
+
+역할:
+
+- 컨트롤러가 반환한 view 이름을 기반으로 실제 템플릿을 찾는다.
+
+예: `return "home";` → `templates/home.html`
+
+---
+
+## 8. Spring MVC 전체 요청 흐름 요약
+
+<CodeLayout inner="center">
+
+```
+클라이언트 요청
+  ↓
+Filter → Interceptor → DispatcherServlet
+  ↓
+HandlerMapping → HandlerAdapter
+  ↓
+Controller 실행
+  ↓
+ArgumentResolver로 파라미터 주입
+  ↓
+ReturnValueHandler로 반환값 처리
+  ↓
+HttpMessageConverter(JSON) / ViewResolver
+  ↓
+응답 반환
+```
+
+</CodeLayout>
+
+---
+
+## 9. 실무 기준 핵심 정리
+
+- DispatcherServlet은 **모든 요청의 단일 관문**이다.
+- ArgumentResolver/ReturnValueHandler가 MVC의 **유연성과 확장성의 핵심**이다.
+- API 서버에서는 **ViewResolver 대신 HttpMessageConverter**가 중심.
+- Filter는 Servlet, Interceptor는 Spring MVC 시스템 레벨.
+- 컨트롤러 작성만 해도 복잡한 내부 구조가 자동으로 처리된다.

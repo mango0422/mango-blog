@@ -6,6 +6,7 @@ import { Callout } from "@/components/mdx/Callout";
 import { Solution } from "@/components/mdx/Solution";
 import { Complexity } from "@/components/mdx/Complexity";
 import { JavaDoc } from "@/components/mdx/JavaDoc";
+import { CodeAlign } from "@/components/mdx/CodeAlign";
 
 const themeComponents = getThemeComponents();
 
@@ -15,13 +16,14 @@ export function useMDXComponents(
   return {
     ...themeComponents,
 
-    Callout,
     Steps,
     Tabs,
     FileTree,
+    Callout,
     Solution,
     Complexity,
     JavaDoc,
+    CodeLayout: CodeAlign,
 
     ...components,
   };
