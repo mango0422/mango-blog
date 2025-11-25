@@ -1,0 +1,378 @@
+---
+title: REST API 기본 설계
+description: URL 설계, HTTP 메서드, DTO, Validation, 계층 구조까지 실무 기준 REST API 설계 원칙 정리
+date: 2025-11-25
+tags:
+  - spring
+  - rest
+  - api
+  - design
+---
+
+# REST API 기본 설계
+
+이 문서는 **Spring MVC 기반 REST API** 를 설계할 때 기준이 되는 원칙들을 정리한다.
+
+- Resource 중심 URI 설계
+- HTTP 메서드 활용 규칙 (GET/POST/PUT/PATCH/DELETE)
+- Request / Response DTO 설계
+- Validation 구조
+- Controller → Service → Repository 계층 분리
+
+---
+
+## 1. Resource 중심 URI 설계
+
+REST API의 핵심은 **명사형 리소스** 를 중심으로 URI를 설계하는 것이다.
+
+### 1.1 기본 원칙
+
+- 동사는 **HTTP 메서드에 맡기고**, URI는 **리소스를 표현하는 명사**로 작성
+- 복수형 사용: `/users`, `/orders`, `/products`
+- 계층 구조 표현: `/users/{id}/orders/{orderId}`
+
+좋은 예:
+
+<CodeLayout>
+
+```
+GET    /users
+GET    /users/{userId}
+POST   /users
+PUT    /users/{userId}
+DELETE /users/{userId}
+
+GET    /users/{userId}/orders
+GET    /users/{userId}/orders/{orderId}
+```
+
+</CodeLayout>
+
+피해야 할 예:
+
+<CodeLayout>
+
+```
+GET /getUserList
+POST /createNewUser
+GET /doOrderForUser
+```
+
+</CodeLayout>
+
+- 동사 + 의미 불명확한 이름 → 유지보수/검색/문서화에 불리함
+
+---
+
+## 2. HTTP 메서드 활용 규칙
+
+### 2.1 CRUD 매핑
+
+- **GET** → 리소스 조회 (멱등 + 안전)
+- **POST** → 리소스 생성 / 비멱등 처리 요청
+- **PUT** → 리소스 전체 교체 (멱등)
+- **PATCH** → 리소스 일부 변경
+- **DELETE** → 리소스 삭제 (멱등)
+
+<CodeLayout>
+
+```http
+GET    /accounts/100          # 계좌 상세 조회
+POST   /accounts              # 계좌 신규 생성
+PUT    /accounts/100          # 계좌 정보 전체 변경
+PATCH  /accounts/100          # 일부 필드만 변경
+DELETE /accounts/100          # 계좌 삭제(또는 비활성화)
+```
+
+</CodeLayout>
+
+멱등성(idempotency)은 **같은 요청을 여러 번 보내도 결과가 달라지지 않는 성질**을 의미한다.
+
+- GET, PUT, DELETE 는 설계상 멱등하게 만드는 것이 좋다.
+- POST 는 보통 멱등하지 않다(매번 새로운 리소스 생성 등).
+
+---
+
+## 3. Request / Response DTO 설계
+
+### 3.1 엔티티 직접 노출 금지
+
+JPA 엔티티를 그대로 JSON으로 노출하면 다음 문제가 생긴다.
+
+- 양방향 연관관계로 인한 무한 루프
+- 내부 구현 변경이 API 스펙에 그대로 드러남
+- 보안/민감 정보 직접 노출 위험
+
+그래서 **항상 DTO를 별도로 정의**하는 것을 기본 원칙으로 삼는다.
+
+<CodeLayout>
+
+```java
+// 요청 DTO
+public record CreateUserRequest(
+        String email,
+        String name,
+        String password
+) {}
+
+// 응답 DTO
+public record UserResponse(
+        Long id,
+        String email,
+        String name
+) {}
+```
+
+</CodeLayout>
+
+---
+
+### 3.2 Controller에서 DTO 사용 예시
+
+<CodeLayout>
+
+```java
+@RestController
+@RequestMapping("/api/users")
+public class UserController {
+
+    private final UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
+
+    @PostMapping
+    public ResponseEntity<UserResponse> createUser(
+            @RequestBody @Valid CreateUserRequest request
+    ) {
+        UserResponse response = userService.createUser(request);
+        URI location = URI.create("/api/users/" + response.id());
+        return ResponseEntity.created(location).body(response);
+    }
+}
+```
+
+</CodeLayout>
+
+- 요청 바디는 `@RequestBody` + DTO로 받는다.
+- `@Valid` 로 Validation을 함께 적용한다.
+- 생성 API는 **Location 헤더 + 201 Created** 를 사용하는 것이 REST 관점에서 가장 이상적이다.
+
+---
+
+## 4. Validation 구조
+
+### 4.1 Bean Validation 애노테이션 사용
+
+요청 DTO에 JSR-380(Bean Validation) 애노테이션을 사용하면 간결하게 검증 규칙을 정의할 수 있다.
+
+<CodeLayout>
+
+```java
+public record CreateUserRequest(
+
+        @Email
+        @NotBlank
+        String email,
+
+        @NotBlank
+        @Size(min = 2, max = 20)
+        String name,
+
+        @NotBlank
+        @Size(min = 8, max = 50)
+        String password
+) {}
+```
+
+</CodeLayout>
+
+Controller에서는 `@Valid` 또는 `@Validated` 만 붙이면 된다.
+
+<CodeLayout>
+
+```java
+@PostMapping
+public ResponseEntity<UserResponse> createUser(
+        @RequestBody @Valid CreateUserRequest request
+) {
+    ...
+}
+```
+
+</CodeLayout>
+
+검증 실패 시 스프링이 `MethodArgumentNotValidException` 을 던지고,
+글로벌 예외 처리(`@ControllerAdvice`)에서 **일관된 에러 응답** 으로 변환하면 된다.
+
+(상세 구현은 `5-exception-handling.mdx` 에서 다룸)
+
+---
+
+## 5. 계층 구조 설계 (Controller → Service → Repository)
+
+REST API도 결국 **계층형 아키텍처** 위에서 동작한다.
+
+기본 계층 분리는 아래처럼 가져가는 것이 좋다.
+
+<CodeLayout inner="center">
+
+```
+Controller  →  Service  →  Repository(JPA)
+    ↓            ↓            ↓
+ API 입구     비즈니스      데이터 접근
+               로직
+```
+
+</CodeLayout>
+
+### 5.1 Controller 역할
+
+- HTTP 관련 처리 (URL, 메서드, 헤더, 상태 코드)
+- Request DTO → Service 입력 모델 변환
+- Service 결과 → Response DTO + HTTP 응답으로 변환
+
+### 5.2 Service 역할
+
+- **비즈니스 규칙** 의 중심
+- 트랜잭션 경계(`@Transactional`) 위치
+- 여러 Repository/외부 시스템 조합
+
+### 5.3 Repository 역할
+
+- 순수하게 데이터 접근만 담당 (JPA, MyBatis 등)
+- 비즈니스 로직 X
+
+---
+
+### 5.4 샘플 코드 구조
+
+<CodeLayout>
+
+```java
+@RestController
+@RequestMapping("/api/orders")
+public class OrderController {
+
+    private final OrderService orderService;
+
+    public OrderController(OrderService orderService) {
+        this.orderService = orderService;
+    }
+
+    @PostMapping
+    public ResponseEntity<OrderResponse> createOrder(
+            @RequestBody @Valid CreateOrderRequest request
+    ) {
+        OrderResponse response = orderService.createOrder(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+}
+```
+
+</CodeLayout>
+
+<CodeLayout>
+
+```java
+@Service
+public class OrderService {
+
+    private final OrderRepository orderRepository;
+
+    @Transactional
+    public OrderResponse createOrder(CreateOrderRequest request) {
+        Order order = Order.create(
+                request.userId(),
+                request.productId(),
+                request.quantity()
+        );
+
+        orderRepository.save(order);
+        return new OrderResponse(order.getId(), order.getStatus());
+    }
+}
+```
+
+</CodeLayout>
+
+<CodeLayout>
+
+```java
+public interface OrderRepository extends JpaRepository<Order, Long> {
+}
+```
+
+</CodeLayout>
+
+---
+
+## 6. 응답 형태 설계
+
+### 6.1 단일 리소스 응답
+
+<CodeLayout>
+
+```json
+{
+  "id": 100,
+  "email": "mango@example.com",
+  "name": "망고"
+}
+```
+
+</CodeLayout>
+
+### 6.2 컬렉션 응답
+
+<CodeLayout>
+
+```json
+{
+  "items": [
+    { "id": 1, "name": "상품 A" },
+    { "id": 2, "name": "상품 B" }
+  ],
+  "page": 0,
+  "size": 10,
+  "totalElements": 27,
+  "totalPages": 3
+}
+```
+
+</CodeLayout>
+
+- 단순 배열이 아니라, **메타데이터(page, size, total 등)** 를 함께 내려줘야 클라이언트가 사용하기 편하다.
+
+### 6.3 에러 응답 기본 형태
+
+에러 응답은 **항상 동일한 스키마**를 유지하는 것이 중요하다.
+
+<CodeLayout>
+
+```json
+{
+  "code": "USER_NOT_FOUND",
+  "message": "사용자를 찾을 수 없습니다.",
+  "detail": null,
+  "timestamp": "2025-11-25T22:10:00+09:00",
+  "path": "/api/users/9999"
+}
+```
+
+</CodeLayout>
+
+구체적인 예외 매핑은 `5-exception-handling.mdx` 에서
+`@ControllerAdvice` 기반으로 다룰 예정.
+
+---
+
+## 7. 실무 기준 핵심 정리
+
+- URI는 **명사형 리소스 + 계층 구조**로 설계한다.
+- 동사는 HTTP 메서드에 맡기고, URI에 동사 이름을 넣지 않는다.
+- 엔티티를 직접 노출하지 말고 **항상 DTO를 사용**한다.
+- 요청 DTO에는 Bean Validation을 적극적으로 사용한다.
+- Controller는 HTTP 입출력, Service는 비즈니스 로직, Repository는 데이터 접근만 담당하게 분리한다.
+- 응답 스키마(성공/실패)는 초기에 잘 정해두고, 서비스 전반에서 일관성을 유지한다.

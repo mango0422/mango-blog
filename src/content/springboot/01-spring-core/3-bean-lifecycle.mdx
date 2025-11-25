@@ -1,0 +1,314 @@
+---
+title: Bean Lifecycle 전체 흐름
+description: 스프링 컨테이너에서 Bean이 생성·초기화·소멸되기까지의 전체 생명주기 정리
+date: 2025-11-25
+tags:
+  - spring
+  - bean
+  - lifecycle
+  - ioc
+---
+
+# Bean Lifecycle 전체 흐름
+
+스프링 IoC 컨테이너는 **Bean의 생성 ~ 소멸까지 전 과정을 관리**한다.
+
+이 문서는 다음 관점에서 Bean 생명주기를 정리한다.
+
+1. Bean 등록 정보(BeanDefinition) 준비
+2. Bean 생성 → 의존성 주입 → 초기화
+3. 런타임 중 Bean 사용
+4. 컨텍스트 종료 시 소멸 콜백 호출
+
+---
+
+## 1. BeanDefinition 로딩 단계
+
+스프링 컨테이너는 먼저 "어떤 Bean을 만들지"에 대한 **메타 정보**를 읽어들인다.
+
+- `@ComponentScan` 으로 스캔한 클래스
+- `@Bean` 메서드가 선언된 `@Configuration` 클래스
+- XML 설정(요즘은 거의 사용 안 함)
+
+이 정보는 내부적으로 **BeanDefinition** 이라는 형태로 저장된다.
+
+<CodeLayout>
+
+```
+소스 코드 (@Component, @Bean, XML)
+        ↓
+BeanDefinition 생성
+        ↓
+ApplicationContext 내부에 BeanDefinition 등록
+```
+
+</CodeLayout>
+
+아직 이 단계에서는 **실제 객체 인스턴스는 생성되지 않은 상태**다.
+
+---
+
+## 2. Bean 생성 ~ 의존성 주입 ~ 초기화 전체 흐름
+
+컨텍스트가 초기화될 때, 스프링은 BeanDefinition 을 참고해서 Bean을 만든다.
+
+전체 흐름을 한 번에 보면 다음과 같다.
+
+<CodeLayout inner="center">
+
+```
+1) Bean 인스턴스 생성 (생성자 호출)
+2) 의존성 주입 (필드/세터/생성자)
+3) Aware 인터페이스 콜백
+4) BeanPostProcessor (before)
+5) 초기화 콜백 (@PostConstruct, afterPropertiesSet 등)
+6) BeanPostProcessor (after)
+→ 이제 컨테이너에서 사용 가능한 Bean 상태
+```
+
+</CodeLayout>
+
+각 단계를 조금 더 쪼개보자.
+
+---
+
+### 2.1 인스턴스 생성
+
+가장 먼저 **순수 Java 객체를 new로 생성**하는 단계다.
+
+- 생성자 호출
+- 아직 의존성 주입 전
+
+---
+
+### 2.2 의존성 주입(Dependency Injection)
+
+다음으로, 해당 Bean이 필요로 하는 의존성을 주입한다.
+
+- 생성자 주입
+- 필드 주입
+- Setter 주입
+
+<CodeLayout>
+
+```java
+@Component
+public class OrderService {
+
+    private final UserRepository userRepository;
+
+    public OrderService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+}
+```
+
+</CodeLayout>
+
+이 시점까지 완료되면, Bean은 필요한 의존 객체를 모두 가진 상태가 된다.
+
+---
+
+### 2.3 Aware 인터페이스 콜백 (선택)
+
+Bean이 **스프링 컨테이너의 내부 인프라 객체**에 접근해야 할 때 사용한다.
+
+예시:
+
+- `BeanNameAware` : 자신의 Bean 이름을 알고 싶을 때
+- `BeanFactoryAware` : BeanFactory 참조 필요
+- `ApplicationContextAware` : ApplicationContext 참조 필요
+
+일반 비즈니스 Bean에서는 가급적 사용을 줄이는 것이 좋다.
+
+---
+
+## 3. 초기화 단계(Init)
+
+의존성 주입이 끝난 뒤, Bean이 **실제로 사용되기 전에 마지막으로 준비 작업**을 할 수 있는 구간이다.
+
+대표적인 초기화 방법은 다음 네 가지다.
+
+1. `@PostConstruct`
+2. `InitializingBean` 인터페이스의 `afterPropertiesSet()`
+3. `@Bean(initMethod = "..." )`
+4. 커스텀 `BeanPostProcessor`
+
+---
+
+### 3.1 @PostConstruct / @PreDestroy
+
+스프링이 권장하는 방법은 **JSR-250 표준 애노테이션** 인 `@PostConstruct`, `@PreDestroy` 를 사용하는 것이다.
+
+<CodeLayout>
+
+```java
+@Component
+public class CacheInitializer {
+
+    private final CacheClient cacheClient;
+
+    public CacheInitializer(CacheClient cacheClient) {
+        this.cacheClient = cacheClient;
+    }
+
+    @PostConstruct
+    public void init() {
+        // 애플리케이션 시작 시 캐시 미리 로딩
+        cacheClient.loadInitialData();
+    }
+
+    @PreDestroy
+    public void shutdown() {
+        // 종료 전에 연결 정리 등
+        cacheClient.close();
+    }
+}
+```
+
+</CodeLayout>
+
+특징:
+
+- 의존성 주입이 끝난 직후 `@PostConstruct` 가 1회 호출
+- 컨텍스트 종료 직전에 `@PreDestroy` 가 1회 호출
+
+---
+
+### 3.2 InitializingBean / DisposableBean
+
+인터페이스를 구현하여 초기화/소멸 콜백을 받을 수도 있다.
+
+<CodeLayout>
+
+```java
+@Component
+public class ReportSender implements InitializingBean, DisposableBean {
+
+    @Override
+    public void afterPropertiesSet() {
+        // 초기화 로직
+    }
+
+    @Override
+    public void destroy() {
+        // 소멸 로직
+    }
+}
+```
+
+</CodeLayout>
+
+단점:
+
+- 스프링 인터페이스에 직접 의존 → **도메인 코드가 스프링에 묶인다**
+- 요즘은 사용 빈도가 낮고, 가급적 `@PostConstruct`, `@PreDestroy` 를 우선 사용
+
+---
+
+### 3.3 @Bean(initMethod, destroyMethod)
+
+자바 설정에서 `@Bean` 을 사용할 때, 초기화/소멸 메서드를 지정할 수 있다.
+
+<CodeLayout>
+
+```java
+@Configuration
+public class AppConfig {
+
+    @Bean(initMethod = "connect", destroyMethod = "disconnect")
+    public ExternalApiClient externalApiClient() {
+        return new ExternalApiClient("https://api.example.com");
+    }
+}
+```
+
+</CodeLayout>
+
+- 스프링 코드 의존 없이, **순수 POJO 메서드 이름만으로 라이프사이클 지정**이 가능하다.
+
+---
+
+## 4. BeanPostProcessor — AOP가 끼어드는 지점
+
+`BeanPostProcessor` 는 **Bean의 초기화 전/후에 개입할 수 있는 확장 포인트**다.
+
+AOP, `@Transactional`, `@Async` 등 스프링의 강력한 기능들은 대부분 이 시점에 프록시를 입힌다.
+
+<CodeLayout>
+
+```java
+public class CustomLoggerPostProcessor implements BeanPostProcessor {
+
+    @Override
+    public Object postProcessBeforeInitialization(Object bean, String beanName) {
+        // 초기화 전에 수행할 로직
+        return bean;
+    }
+
+    @Override
+    public Object postProcessAfterInitialization(Object bean, String beanName) {
+        // 초기화 후에 프록시 감싸기 등
+        return bean;
+    }
+}
+```
+
+</CodeLayout>
+
+실무에서는 직접 구현하기보다는, "이 타이밍에 무언가가 일어난다" 정도만 이해하고
+AOP, 트랜잭션이 **BeanPostProcessor 기반으로 동작**한다는 사실을 기억하면 충분하다.
+
+---
+
+## 5. 소멸(Destroy) 단계
+
+애플리케이션 종료 시점 또는 컨텍스트 종료 시점에 Bean 소멸 콜백이 호출된다.
+
+실행 순서는 다음과 같다.
+
+<CodeLayout>
+
+```
+1) @PreDestroy
+2) DisposableBean.destroy()
+3) @Bean의 destroyMethod
+```
+
+</CodeLayout>
+
+이 단계에서 주로 하는 일:
+
+- DB 커넥션 풀 정리
+- 외부 소켓/네트워크 자원 해제
+- 쓰레드풀 shutdown
+
+---
+
+## 6. 전체 Bean Lifecycle 요약
+
+<CodeLayout inner="center">
+
+```
+1. BeanDefinition 로딩
+2. Bean 인스턴스 생성 (생성자)
+3. 의존성 주입 (DI)
+4. Aware 콜백
+5. BeanPostProcessor(before)
+6. 초기화 콜백 (@PostConstruct, afterPropertiesSet, initMethod)
+7. BeanPostProcessor(after)
+→ 애플리케이션에서 Bean 사용
+8. 컨텍스트 종료 시 소멸 콜백 (@PreDestroy, destroy, destroyMethod)
+```
+
+</CodeLayout>
+
+---
+
+## 7. 실무 기준 핵심 정리
+
+- 비즈니스 Bean에서는 **`@PostConstruct` / `@PreDestroy`** 를 우선 사용한다.
+- 외부 리소스(소켓, 커넥션, 스레드풀)를 다루는 Bean은 **소멸 콜백을 반드시 구현**해야 한다.
+- 라이프사이클 전체를 이해하면, AOP/트랜잭션/리소스 관리가 **어디에 얹혀 동작하는지** 한눈에 보인다.
+- BeanPostProcessor는 내부적으로 매우 많이 쓰이지만, 직접 구현할 일은 드물다.
+- "생성 → 주입 → 초기화 → 사용 → 소멸" 흐름만 명확하게 머릿속에 그려지면, 나머지는 구현 디테일이다.
