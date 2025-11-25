@@ -47,8 +47,9 @@ IoC의 핵심은 다음 두 구조로 구현된다.
 - BeanFactory 확장판
 - 메시지 소스, 이벤트 발행, AOP, 환경 정보 등 다양한 기능 포함
 
-스프링 부트에서는 기본적으로 **AnnotationConfigApplicationContext** 기반으로 동작하며,  
-대부분의 개발자는 ApplicationContext만 사용한다.
+스프링 부트에서는 환경(web/non-web)에 따라
+`ApplicationContext`의 여러 구현체(예: `AnnotationConfigServletWebServerApplicationContext`)를 사용하지만,
+개발자는 보통 이를 단순히 `ApplicationContext`로 취급하면 된다.
 
 ---
 

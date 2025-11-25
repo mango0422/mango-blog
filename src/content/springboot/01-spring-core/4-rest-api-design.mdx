@@ -203,7 +203,7 @@ public ResponseEntity<UserResponse> createUser(
 
 </CodeLayout>
 
-검증 실패 시 스프링이 `MethodArgumentNotValidException` 을 던지고,
+검증 실패 시 스프링이 `MethodArgumentNotValidException` 을 던지고,  
 글로벌 예외 처리(`@ControllerAdvice`)에서 **일관된 에러 응답** 으로 변환하면 된다.
 
 (상세 구현은 `5-exception-handling.mdx` 에서 다룸)
@@ -370,9 +370,9 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
 ## 7. 실무 기준 핵심 정리
 
-- URI는 **명사형 리소스 + 계층 구조**로 설계한다.
+- `URI`는 **명사형 리소스 + 계층 구조**로 설계한다.
 - 동사는 HTTP 메서드에 맡기고, URI에 동사 이름을 넣지 않는다.
-- 엔티티를 직접 노출하지 말고 **항상 DTO를 사용**한다.
-- 요청 DTO에는 Bean Validation을 적극적으로 사용한다.
-- Controller는 HTTP 입출력, Service는 비즈니스 로직, Repository는 데이터 접근만 담당하게 분리한다.
+- 엔티티를 직접 노출하지 말고 **항상 `DTO`를 사용**한다.
+- 요청 DTO에는 `Bean Validation`을 적극적으로 사용한다.
+- `Controller`는 **HTTP 입출력**, `Service`는 **비즈니스 로직**, `Repository`는 **데이터 접근**만 담당하게 분리한다.
 - 응답 스키마(성공/실패)는 초기에 잘 정해두고, 서비스 전반에서 일관성을 유지한다.

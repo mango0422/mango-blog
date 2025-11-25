@@ -265,17 +265,11 @@ AOP, 트랜잭션이 **BeanPostProcessor 기반으로 동작**한다는 사실�
 
 애플리케이션 종료 시점 또는 컨텍스트 종료 시점에 Bean 소멸 콜백이 호출된다.
 
-실행 순서는 다음과 같다.
+소멸 시에는 다음과 같은 콜백이 호출될 수 있다.
 
-<CodeLayout>
-
-```
-1) @PreDestroy
-2) DisposableBean.destroy()
-3) @Bean의 destroyMethod
-```
-
-</CodeLayout>
+- `@PreDestroy`
+- `DisposableBean.destroy()`
+- `@Bean`의 `destroyMethod`
 
 이 단계에서 주로 하는 일:
 

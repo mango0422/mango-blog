@@ -1,0 +1,353 @@
+---
+title: 예외 처리와 @ControllerAdvice
+description: Spring MVC에서 일관된 에러 응답을 만들기 위한 글로벌 예외 처리 구조 정리
+date: 2025-11-25
+tags:
+  - spring
+  - mvc
+  - exception
+  - controlleradvice
+---
+
+# 예외 처리(@ControllerAdvice)
+
+REST API에서 예외 처리는 **"일관된 에러 응답"** 을 만드는 것이 핵심이다.
+
+이 문서에서는 다음을 기준으로 정리한다.
+
+1. 예외 계층 구조 설계
+2. ErrorResponse 공통 스키마 정의
+3. `@ControllerAdvice` + `@ExceptionHandler` 로 글로벌 처리
+4. Validation 예외(`MethodArgumentNotValidException` 등) 처리
+5. 실무에서 자주 쓰는 패턴
+
+---
+
+## 1. 예외 계층 구조 설계
+
+먼저 "내 서비스 전용" 예외 계층을 하나 잡아두면 좋다.
+
+### 1.1 기본 구조 예시
+
+<CodeLayout>
+
+```java
+public abstract class BusinessException extends RuntimeException {
+
+    private final String code;
+    private final HttpStatus status;
+
+    protected BusinessException(String code, HttpStatus status, String message) {
+        super(message);
+        this.code = code;
+        this.status = status;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public HttpStatus getStatus() {
+        return status;
+    }
+}
+```
+
+</CodeLayout>
+
+<CodeLayout>
+
+```java
+public class UserNotFoundException extends BusinessException {
+
+    public UserNotFoundException(Long userId) {
+        super(
+            "USER_NOT_FOUND",
+            HttpStatus.NOT_FOUND,
+            "사용자를 찾을 수 없습니다. id=" + userId
+        );
+    }
+}
+```
+
+</CodeLayout>
+
+이렇게 해두면:
+
+- 공통 필드: `code`, `status`, `message`
+- 개별 예외는 **의미 있는 도메인 이름**만 만들면 됨 (ex. `InsufficientBalanceException`)
+
+---
+
+## 2. ErrorResponse 공통 스키마
+
+성공 응답처럼, 에러 응답도 **항상 동일한 JSON 구조**를 유지해야 한다.
+
+### 2.1 기본 스키마 예시
+
+<CodeLayout>
+
+```java
+public record ErrorResponse(
+        String code,
+        String message,
+        String detail,
+        String path,
+        String timestamp
+) {
+
+    public static ErrorResponse of(
+            String code,
+            String message,
+            String detail,
+            String path
+    ) {
+        return new ErrorResponse(
+                code,
+                message,
+                detail,
+                path,
+                OffsetDateTime.now().toString()
+        );
+    }
+}
+```
+
+</CodeLayout>
+
+여기서:
+
+- `code` : 비즈니스 에러 코드 (ex. `USER_NOT_FOUND`)
+- `message` : 사용자에게 노출 가능한 메시지
+- `detail` : 추가 디버깅 정보(필요 없으면 null)
+- `path` : 요청 URI
+- `timestamp`: 발생 시각
+
+---
+
+## 3. @ControllerAdvice + @ExceptionHandler
+
+`@ControllerAdvice` 는 **전역 예외 처리기**를 정의하기 위한 애노테이션이다.
+
+### 3.1 기본 틀
+
+<CodeLayout>
+
+```java
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<ErrorResponse> handleBusiness(
+            BusinessException ex,
+            HttpServletRequest request
+    ) {
+        ErrorResponse body = ErrorResponse.of(
+                ex.getCode(),
+                ex.getMessage(),
+                null,
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(ex.getStatus()).body(body);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleException(
+            Exception ex,
+            HttpServletRequest request
+    ) {
+        ErrorResponse body = ErrorResponse.of(
+                "INTERNAL_SERVER_ERROR",
+                "알 수 없는 오류가 발생했습니다.",
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
+    }
+}
+```
+
+</CodeLayout>
+
+설명:
+
+- `@RestControllerAdvice`
+  - `@ControllerAdvice` + `@ResponseBody` 를 합쳐 놓은 형태
+  - 예외 핸들러 메서드의 반환값이 자동으로 JSON으로 직렬화됨
+- `@ExceptionHandler(BusinessException.class)`
+  - 비즈니스 예외는 여기서 한 번에 처리
+- `@ExceptionHandler(Exception.class)`
+  - 마지막 안전망(catch-all)으로 사용
+
+---
+
+## 4. Validation 예외 처리
+
+요청 DTO에 `@Valid` 를 붙였을 때 발생하는 대표적인 예외들:
+
+- `MethodArgumentNotValidException` : @RequestBody 검증 실패
+- `BindException` : Form 데이터/쿼리 파라미터 바인딩 실패
+
+이를 `GlobalExceptionHandler` 에서 함께 처리하면 된다.
+
+### 4.1 MethodArgumentNotValidException 처리
+
+<CodeLayout>
+
+```java
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleMethodArgumentNotValid(
+            MethodArgumentNotValidException ex,
+            HttpServletRequest request
+    ) {
+        BindingResult bindingResult = ex.getBindingResult();
+
+        String detail = bindingResult.getFieldErrors().stream()
+                .map(error -> error.getField() + "=" + error.getDefaultMessage())
+                .collect(Collectors.joining(", "));
+
+        ErrorResponse body = ErrorResponse.of(
+                "INVALID_REQUEST",
+                "요청 값이 올바르지 않습니다.",
+                detail,
+                request.getRequestURI()
+        );
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
+    }
+}
+```
+
+</CodeLayout>
+
+- 여러 필드 에러를 하나의 문자열로 합쳐 detail에 담는 패턴
+- 필요하다면 `List<FieldErrorResponse>` 같은 별도 DTO를 만들어 더 구조화해도 됨
+
+### 4.2 BindException 처리
+
+쿼리 파라미터나 폼 데이터 바인딩 실패 시 주로 발생한다.
+
+<CodeLayout>
+
+```java
+    @ExceptionHandler(BindException.class)
+    public ResponseEntity<ErrorResponse> handleBind(
+            BindException ex,
+            HttpServletRequest request
+    ) {
+        String detail = ex.getFieldErrors().stream()
+                .map(error -> error.getField() + "=" + error.getDefaultMessage())
+                .collect(Collectors.joining(", "));
+
+        ErrorResponse body = ErrorResponse.of(
+                "INVALID_REQUEST",
+                "요청 값이 올바르지 않습니다.",
+                detail,
+                request.getRequestURI()
+        );
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
+    }
+```
+
+</CodeLayout>
+
+---
+
+## 5. 공통 패턴: 404 / 400 / 500
+
+실무에서 자주 쓰는 HTTP 상태 코드는 다음 세 가지다.
+
+- 400 Bad Request : 클라이언트 입력 오류 (검증 실패, 파라미터 형식 오류 등)
+- 404 Not Found : 리소스를 찾을 수 없는 경우
+- 500 Internal Server Error : 서버 내부 버그 / 예측 불가 오류
+
+### 5.1 도메인별 BusinessException 활용 예시
+
+<CodeLayout>
+
+```java
+public class AccountNotFoundException extends BusinessException {
+
+    public AccountNotFoundException(Long accountId) {
+        super(
+            "ACCOUNT_NOT_FOUND",
+            HttpStatus.NOT_FOUND,
+            "계좌를 찾을 수 없습니다. id=" + accountId
+        );
+    }
+}
+```
+
+</CodeLayout>
+
+Service 코드에서는 단순히 해당 예외를 던지기만 하면 된다.
+
+<CodeLayout>
+
+```java
+@Service
+public class AccountService {
+
+    private final AccountRepository accountRepository;
+
+    public Account getAccount(Long id) {
+        return accountRepository.findById(id)
+                .orElseThrow(() -> new AccountNotFoundException(id));
+    }
+}
+```
+
+</CodeLayout>
+
+컨트롤러까지 예외를 그냥 전파하면,
+`GlobalExceptionHandler` 가 받아서 **일관된 ErrorResponse** 로 변환한다.
+
+---
+
+## 6. 성공/실패 스펙을 함께 설계하기
+
+REST API를 설계할 때는:
+
+- 성공 응답 스키마 (단일, 리스트, 페이지)
+- 실패 응답 스키마 (Validation, 비즈니스 예외, 시스템 예외)
+
+를 **처음부터 세트로 설계**하는 것이 좋다.
+
+<CodeLayout>
+
+```json
+// 성공 - 단일
+{
+  "id": 100,
+  "email": "mango@example.com",
+  "name": "망고"
+}
+
+// 실패 - 공통
+{
+  "code": "USER_NOT_FOUND",
+  "message": "사용자를 찾을 수 없습니다.",
+  "detail": null,
+  "timestamp": "2025-11-25T22:10:00+09:00",
+  "path": "/api/users/9999"
+}
+```
+
+</CodeLayout>
+
+---
+
+## 7. 실무 기준 핵심 정리
+
+- 서비스 전용 **BusinessException 계층**을 하나 정의해두면 관리가 편하다.
+- `@RestControllerAdvice` + `@ExceptionHandler` 로 **전역 예외 처리기**를 구현한다.
+- ErrorResponse 스키마는 프로젝트 초기에 확실히 정하고, 전 구간에서 통일한다.
+- 검증 실패(400) 와 비즈니스 도메인 오류(예: 잔액 부족, 리소스 없음)를 구분해 표현한다.
+- 컨트롤러/서비스는 예외만 던지고, 실제 응답 형식 변환은 전역 핸들러에 맡기는 것이 깔끔하다.
+
+> 이 문서는 `4-rest-api-design.mdx` 와 함께 보면,
+> **REST API 설계 + 에러 처리 일관성** 을 한 번에 정리할 수 있는 세트가 된다.
