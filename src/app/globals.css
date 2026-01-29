@@ -1,105 +1,317 @@
 /* app/globals.css */
+/* Tailwind CSS v4 + Nextra 4.6.1 통합 */
+/* 의미 기반 토큰 시스템 */
+
 @import "tailwindcss";
 @import "nextra-theme-docs/style.css";
-/* @import "nextra-theme-blog/style.css"; */
 
-/* 1. Tailwind v4 테마 정의 (망고 블로그) */
+/* ============================================
+   1. Tailwind v4 @theme - 유틸리티 클래스 생성
+   --color-* 형태로 정의하면 bg-*, text-* 등 사용 가능
+   ============================================ */
 @theme {
   /* 폰트 변수 (layout.tsx에서 주입됨) */
   --font-cute: var(--font-cute);
   --font-sans: var(--font-sans);
 
-  /* 망고 컬러 팔레트 */
-  --color-mango-bg: oklch(0.18 0.03 260);
-  --color-mango-card: oklch(0.22 0.03 260);
-  --color-mango-accent: oklch(0.78 0.16 280);
+  /* 의미 기반 컬러 토큰 */
+  --color-bg: var(--app-bg);
+  --color-surface: var(--app-surface);
+  --color-surface-strong: var(--app-surface-strong);
+
+  --color-text: var(--app-text);
+  --color-text-muted: var(--app-text-muted);
+
+  --color-border: var(--app-border);
+
+  --color-accent: var(--app-accent);
+  --color-accent-contrast: var(--app-accent-contrast);
+  --color-focus: var(--app-focus);
+
+  --color-interactive: var(--app-interactive);
+  --color-interactive-hover: var(--app-interactive-hover);
 }
 
-/* 2. Nextra CSS 변수 오버라이딩 (디자인 장악) */
-:root {
-  --nextra-primary-hue: 280deg;
-  --nextra-primary-saturation: 80%;
+/* ============================================
+   2. 테마 A: blue-hour
+      La La Land 블루아워 - 해질녘 파란빛 하늘
+   ============================================ */
+:root[data-theme="blue-hour"] {
+  --app-bg: #0f172a;
+  --app-surface: #1e293b;
+  --app-surface-strong: #111827;
 
-  /* 폰트 적용: Nextra 기본 폰트도 CookieRun으로 */
+  --app-text: #e5e7eb;
+  --app-text-muted: #9ca3af;
+
+  --app-border: #334155;
+
+  --app-accent: #a78bfa;
+  --app-accent-contrast: #1f2937;
+  --app-focus: #c4b5fd;
+
+  --app-interactive: #1e293b;
+  --app-interactive-hover: #334155;
+
+  /* Nextra 통합 변수 */
+  --nextra-primary-hue: 260deg;
+  --nextra-primary-saturation: 60%;
+  --nextra-bg: var(--app-bg);
   --nextra-font-sans: var(--font-sans);
-
-  --nextra-bg: #ffffff;
 }
 
-/* 전체 페이지 기본 배경 */
+/* ============================================
+   3. 테마 B: neon-interior
+      La La Land 재즈바 - 따뜻한 네온 조명
+   ============================================ */
+:root[data-theme="neon-interior"] {
+  --app-bg: #1a0f0a;
+  --app-surface: #2d1810;
+  --app-surface-strong: #1f1209;
+
+  --app-text: #fef3e2;
+  --app-text-muted: #d4a574;
+
+  --app-border: #4a2c1a;
+
+  --app-accent: #f59e0b;
+  --app-accent-contrast: #1a0f0a;
+  --app-focus: #fcd34d;
+
+  --app-interactive: #2d1810;
+  --app-interactive-hover: #4a2c1a;
+
+  /* Nextra 통합 변수 */
+  --nextra-primary-hue: 38deg;
+  --nextra-primary-saturation: 92%;
+  --nextra-bg: var(--app-bg);
+}
+
+/* ============================================
+   3-C. 테마 C: sunset-boulevard
+        선셋~야간 전환 - 네온 핑크 감정선
+   ============================================ */
+:root[data-theme="sunset-boulevard"] {
+  --app-bg: #1a1026;
+  --app-surface: #2b1742;
+  --app-surface-strong: #130a1f;
+
+  --app-text: #f4e9ff;
+  --app-text-muted: #c7b2dd;
+
+  --app-border: #3a2357;
+
+  --app-accent: #ff3d81;
+  --app-accent-contrast: #240a18;
+  --app-focus: #ffc2d8;
+
+  --app-interactive: #2b1742;
+  --app-interactive-hover: #3a2357;
+
+  --nextra-primary-hue: 340deg;
+  --nextra-primary-saturation: 100%;
+  --nextra-bg: var(--app-bg);
+}
+
+/* ============================================
+   3-D. 테마 D: dawn-freeway
+        새벽 고속도로 - 차분한 블루 + 앰버
+   ============================================ */
+:root[data-theme="dawn-freeway"] {
+  --app-bg: #0b1a33;
+  --app-surface: #112a52;
+  --app-surface-strong: #071224;
+
+  --app-text: #eaf1ff;
+  --app-text-muted: #a9c2ee;
+
+  --app-border: #1b3a69;
+
+  --app-accent: #ffb020;
+  --app-accent-contrast: #1a1206;
+  --app-focus: #ffe0a3;
+
+  --app-interactive: #112a52;
+  --app-interactive-hover: #1b3a69;
+
+  --nextra-primary-hue: 40deg;
+  --nextra-primary-saturation: 100%;
+  --nextra-bg: var(--app-bg);
+}
+
+/* ============================================
+   3-E. 테마 E: jazz-bordeaux
+        재즈바/공연장 - 버건디 레드 조명
+   ============================================ */
+:root[data-theme="jazz-bordeaux"] {
+  --app-bg: #14060a;
+  --app-surface: #240b12;
+  --app-surface-strong: #0e0407;
+
+  --app-text: #fff1f4;
+  --app-text-muted: #d7aab3;
+
+  --app-border: #3a111c;
+
+  --app-accent: #e11d48;
+  --app-accent-contrast: #1b060c;
+  --app-focus: #ff9fb2;
+
+  --app-interactive: #240b12;
+  --app-interactive-hover: #3a111c;
+
+  --nextra-primary-hue: 347deg;
+  --nextra-primary-saturation: 77%;
+  --nextra-bg: var(--app-bg);
+}
+
+/* ============================================
+   3-F. 테마 F: studio-teal-orange
+        촬영 스튜디오 - 티얼/오렌지 시네마 룩
+   ============================================ */
+:root[data-theme="studio-teal-orange"] {
+  --app-bg: #071b1c;
+  --app-surface: #0e2a2c;
+  --app-surface-strong: #051214;
+
+  --app-text: #e8fffb;
+  --app-text-muted: #95d7cf;
+
+  --app-border: #134043;
+
+  --app-accent: #ff7a18;
+  --app-accent-contrast: #1a0e05;
+  --app-focus: #ffd2b0;
+
+  --app-interactive: #0e2a2c;
+  --app-interactive-hover: #134043;
+
+  --nextra-primary-hue: 25deg;
+  --nextra-primary-saturation: 100%;
+  --nextra-bg: var(--app-bg);
+}
+
+/* ============================================
+   3-G. 테마 G: desert-dusk
+        사막의 해질녘 - 따뜻한 먼지 + 코랄
+   ============================================ */
+:root[data-theme="desert-dusk"] {
+  --app-bg: #16101a;
+  --app-surface: #241a2b;
+  --app-surface-strong: #0f0b12;
+
+  --app-text: #fff2e5;
+  --app-text-muted: #d5b9a0;
+
+  --app-border: #3a2a44;
+
+  --app-accent: #ff6b3d;
+  --app-accent-contrast: #1a0c07;
+  --app-focus: #ffcfbf;
+
+  --app-interactive: #241a2b;
+  --app-interactive-hover: #3a2a44;
+
+  --nextra-primary-hue: 15deg;
+  --nextra-primary-saturation: 100%;
+  --nextra-bg: var(--app-bg);
+}
+
+/* ============================================
+   3-H. 테마 H: pastel-night
+        몽환적인 밤 - 파스텔 바이올렛
+   ============================================ */
+:root[data-theme="pastel-night"] {
+  --app-bg: #0d1422;
+  --app-surface: #182038;
+  --app-surface-strong: #0a0f19;
+
+  --app-text: #f2f5ff;
+  --app-text-muted: #b9c3dd;
+
+  --app-border: #2a3558;
+
+  --app-accent: #a78bfa;
+  --app-accent-contrast: #0f0b1a;
+  --app-focus: #ddd6fe;
+
+  --app-interactive: #182038;
+  --app-interactive-hover: #2a3558;
+
+  --nextra-primary-hue: 263deg;
+  --nextra-primary-saturation: 90%;
+  --nextra-bg: var(--app-bg);
+}
+
+/* ============================================
+   4. 전역 기본 스타일
+   ============================================ */
 html,
 body {
-  background-color: var(--color-mango-bg);
+  background: var(--app-bg);
+  color: var(--app-text);
 }
 
-/* 다크모드 강제 색상 */
-.dark {
-  --nextra-bg: var(--color-mango-bg) !important;
-  --nextra-sidebar-bg: var(--color-mango-bg) !important;
+/* ============================================
+   5. Nextra 테마 오버라이드 (최소한)
+   ============================================ */
+
+/* 사이드바 배경 - 본체만 설정 (container는 7번 섹션에서 별도 처리) */
+.nextra-sidebar {
+  background-color: var(--app-surface) !important;
 }
 
-/* 다크모드 수정: 텍스트 가독성을 위해 밝기를 올림 */
-.dark body {
-  /* 기존 0.9 -> 0.94 로 상향 조정 (더 밝게) */
-  color: oklch(0.94 0.02 260);
-}
-
-/* 보조 텍스트들도 명도 대비를 높입니다 */
-.dark .nx-text-gray-400,
-.dark .nx-text-slate-400,
-.dark .nx-text-neutral-400 {
-  /* 기존 0.8 -> 0.85 */
-  color: oklch(0.85 0.03 260) !important;
-}
-
-.dark .nx-text-gray-500,
-.dark .nx-text-slate-500,
-.dark .nx-text-neutral-500 {
-  /* 기존 0.86 -> 0.90 */
-  color: oklch(0.9 0.03 260) !important;
-}
-
-/* 사이드바/네비게이션 항목도 더 선명하게 */
-.dark .nextra-sidebar .nx-text-sm,
-.dark .nextra-sidebar .nx-text-xs {
-  color: oklch(0.9 0.02 260) !important;
-}
-
-/* 푸터처럼 '회색 설명글'이 많은 곳도 전체 상향 */
-.dark footer,
-.dark .nextra-footer {
-  color: oklch(0.84 0.02 260);
-}
-
-/* 다크모드일 때 사이드바/메뉴 텍스트 더 밝게 */
-.dark .nextra-sidebar-item,
-.dark .nextra-sidebar-item a,
-.dark .nextra-menu,
-.dark .nextra-menu a {
-  color: oklch(0.85 0.03 280) !important; /* 밝은 보라빛 회색 */
-}
-
-/* 활성 메뉴/호버 시는 더 밝게 */
-.dark .nextra-sidebar-item a:hover,
-.dark .nextra-sidebar-item[data-active="true"] a,
-.dark .nextra-sidebar-link:is([data-active="true"], :hover) {
-  color: oklch(0.97 0.02 280) !important;
-}
-
-/* 섹션 제목(예: "Posts", "Til")도 같이 밝게 */
-.dark .nextra-sidebar-title,
-.dark .nextra-menu-header {
-  color: oklch(0.8 0.03 280) !important;
-}
-
-.dark main,
-.dark .nextra-content,
-.dark .nextra-layout {
+/* 메인 콘텐츠 영역 */
+main,
+.nextra-content,
+.nextra-layout {
   background-color: transparent !important;
-  box-shadow: none !important;
 }
 
-/* 제목 폰트 교체 (귀여운 폰트) */
+/* 사이드바/메뉴 텍스트 */
+.nextra-sidebar-item,
+.nextra-sidebar-item a,
+.nextra-menu,
+.nextra-menu a {
+  color: var(--app-text-muted) !important;
+}
+
+/* 활성/호버 메뉴 항목 */
+.nextra-sidebar-item a:hover,
+.nextra-sidebar-item[data-active="true"] a,
+.nextra-sidebar-link:is([data-active="true"], :hover) {
+  color: var(--app-text) !important;
+  background-color: var(--app-interactive-hover) !important;
+}
+
+/* 섹션 제목 */
+.nextra-sidebar-title,
+.nextra-menu-header {
+  color: var(--app-text-muted) !important;
+}
+
+/* 푸터 */
+footer,
+.nextra-footer {
+  color: var(--app-text-muted);
+  background-color: var(--app-surface) !important;
+}
+
+/* 보조 텍스트 클래스 */
+.nx-text-gray-400,
+.nx-text-slate-400,
+.nx-text-neutral-400,
+.nx-text-gray-500,
+.nx-text-slate-500,
+.nx-text-neutral-500 {
+  color: var(--app-text-muted) !important;
+}
+
+/* ============================================
+   6. 폰트 설정
+   ============================================ */
+
+/* 제목 폰트 */
 h1,
 h2,
 h3,
@@ -113,26 +325,47 @@ h6,
   letter-spacing: 0.03em;
 }
 
-/* 본문 폰트 (가독성) */
+/* 본문 폰트 */
 body {
   font-family: var(--font-sans);
 }
 
-/* 데스크톱: 왼쪽 사이드바 오버레이/패널 */
+/* ============================================
+   7. 사이드바/네비게이션 스타일
+   ============================================ */
+
+/* 데스크톱: 플로팅 카드 스타일 사이드바 */
 @media (min-width: 1025px) {
   .nextra-sidebar-container {
-    background-color: rgba(0, 0, 0, 0.55);
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
+    background-color: transparent !important;
+    padding: 1rem !important;
+    padding-right: 0 !important;
   }
 
   .nextra-sidebar {
-    background-color: var(--color-mango-bg);
-    box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+    background-color: var(--app-surface) !important;
+    border: 1px solid var(--app-border) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
+    margin: 0 !important;
+    height: calc(100dvh - var(--nextra-navbar-height) - 2rem) !important;
+    transition: width 0.2s ease, opacity 0.2s ease !important;
+  }
+
+  /* 사이드바 접힌 상태 스타일 - Nextra 기본 동작 유지 */
+  .nextra-sidebar:has(button[aria-expanded="false"]) {
+    border-radius: 10px !important;
+    overflow: hidden !important;
+  }
+
+  .nextra-sidebar:has(button[aria-expanded="false"]) .nextra-sidebar-footer {
+    border-bottom: none !important;
+    border-radius: 10px !important;
+    justify-content: center !important;
   }
 }
 
-/* 모바일: 햄버거 메뉴 오버레이/패널 */
+/* 모바일: 햄버거 메뉴 */
 @media (max-width: 1024px) {
   .nextra-mobile-nav {
     background-color: rgba(0, 0, 0, 0.55) !important;
@@ -142,20 +375,137 @@ body {
 
   .nextra-mobile-nav > div,
   .nextra-mobile-nav > ul {
-    background-color: var(--color-mango-bg);
+    background-color: var(--app-surface);
     border-radius: 0.75rem;
     margin: 0.75rem;
   }
 }
 
-/* 코드 블럭: 내용 길이만큼만 보이도록 (shrink-to-fit) */
+/* ============================================
+   8. 코드 블럭 스타일
+   ============================================ */
 .nextra-code-block {
-  display: inline-block; /* 인라인 블럭 → 내용 크기 기준 */
-  width: auto !important; /* w-full 덮어쓰기 (중요) */
-  max-width: 100%; /* 너무 길면 부모 폭까지만 */
+  display: inline-block;
+  width: auto !important;
+  max-width: 100%;
 }
 
-/* 안쪽 pre가 있다면: 가로 스크롤 허용만 유지 */
 .nextra-code-block pre {
   overflow-x: auto;
+  background-color: var(--app-surface-strong) !important;
+  border: 1px solid var(--app-border);
+}
+
+/* ============================================
+   9. 버튼 및 인터랙티브 요소
+   ============================================ */
+button,
+.nextra-button {
+  transition: all 0.2s ease;
+}
+
+/* 사이드바 푸터 (토글 버튼 포함) - 하단 → 상단 이동 */
+.nextra-sidebar-footer {
+  position: sticky !important;
+  bottom: auto !important;
+  top: 0 !important;
+  order: -1 !important;
+  border-top: none !important;
+  border-bottom: 1px solid var(--app-border) !important;
+  background-color: var(--app-surface) !important;
+  border-radius: 12px 12px 0 0 !important;
+  padding: 0.75rem 1rem !important;
+  margin: 0 !important;
+}
+
+/* 사이드바 토글 버튼 스타일 */
+button[title="Collapse sidebar"],
+button[title="Expand sidebar"] {
+  background-color: var(--app-interactive) !important;
+  color: var(--app-text-muted) !important;
+  border: 1px solid var(--app-border) !important;
+  border-radius: 6px !important;
+}
+
+button[title="Collapse sidebar"]:hover,
+button[title="Expand sidebar"]:hover {
+  background-color: var(--app-interactive-hover) !important;
+  color: var(--app-text) !important;
+  border-color: var(--app-accent) !important;
+}
+
+/* ============================================
+   10. 링크 스타일
+   ============================================ */
+a {
+  color: var(--app-accent);
+  transition: color 0.15s ease;
+}
+
+a:hover {
+  color: var(--app-focus);
+}
+
+/* 내부 콘텐츠 링크 */
+.nextra-content a {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* ============================================
+   11. 테이블 스타일
+   ============================================ */
+table {
+  border-collapse: collapse;
+}
+
+th,
+td {
+  border: 1px solid var(--app-border);
+  padding: 0.5rem 1rem;
+}
+
+th {
+  background-color: var(--app-surface-strong);
+  color: var(--app-text);
+}
+
+tr:nth-child(even) {
+  background-color: var(--app-surface);
+}
+
+/* ============================================
+   12. 스크롤바 스타일
+   ============================================ */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--app-surface);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--app-border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--app-accent);
+}
+
+/* ============================================
+   13. 선택 영역 스타일
+   ============================================ */
+::selection {
+  background-color: var(--app-accent);
+  color: var(--app-accent-contrast);
+}
+
+/* ============================================
+   14. 유틸리티 클래스
+   ============================================ */
+.theme-transition {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }

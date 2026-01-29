@@ -2,14 +2,15 @@
 import nextra from "nextra";
 
 const withNextra = nextra({
-  // 검색 엔진(Pagefind) 설정 – 코드블록은 검색 제외 예시
-  // 필요 없으면 search: true 로 두거나 아예 옵션 제거해도 됨
-  search: { codeblocks: false }, // :contentReference[oaicite:3]{index=3}
+  search: { codeblocks: false },
 });
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: "export",
+  distDir: "docs",
   reactStrictMode: true,
+  images: { unoptimized: true },
   // Next 15.3+ 에서는 turbopack.resolveAlias 사용 :contentReference[oaicite:4]{index=4}
   turbopack: {
     resolveAlias: {
