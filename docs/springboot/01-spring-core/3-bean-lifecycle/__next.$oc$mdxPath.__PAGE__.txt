@@ -1,0 +1,395 @@
+1:"$Sreact.fragment"
+2:I[36382,["/mango-blog/_next/static/chunks/508d891aa0792da0.js","/mango-blog/_next/static/chunks/c35a7285345f739e.js","/mango-blog/_next/static/chunks/cea628e83a0a07c2.js","/mango-blog/_next/static/chunks/311bfda68bef2673.js","/mango-blog/_next/static/chunks/8fba60bd4135542a.js","/mango-blog/_next/static/chunks/caa4d2b3cb50cf17.js","/mango-blog/_next/static/chunks/b39b1f344c22c3eb.js","/mango-blog/_next/static/chunks/e1a9aaa3e8d4ba89.js","/mango-blog/_next/static/chunks/36d54e21a0527d75.js","/mango-blog/_next/static/chunks/6beefafa8f4f3a9a.js","/mango-blog/_next/static/chunks/b417336136017bb8.js"],"TOCProvider"]
+3:I[18476,["/mango-blog/_next/static/chunks/508d891aa0792da0.js","/mango-blog/_next/static/chunks/c35a7285345f739e.js","/mango-blog/_next/static/chunks/cea628e83a0a07c2.js","/mango-blog/_next/static/chunks/311bfda68bef2673.js","/mango-blog/_next/static/chunks/8fba60bd4135542a.js","/mango-blog/_next/static/chunks/caa4d2b3cb50cf17.js","/mango-blog/_next/static/chunks/b39b1f344c22c3eb.js","/mango-blog/_next/static/chunks/e1a9aaa3e8d4ba89.js","/mango-blog/_next/static/chunks/36d54e21a0527d75.js","/mango-blog/_next/static/chunks/6beefafa8f4f3a9a.js","/mango-blog/_next/static/chunks/b417336136017bb8.js"],"Sidebar"]
+4:I[83985,["/mango-blog/_next/static/chunks/508d891aa0792da0.js","/mango-blog/_next/static/chunks/c35a7285345f739e.js","/mango-blog/_next/static/chunks/cea628e83a0a07c2.js","/mango-blog/_next/static/chunks/311bfda68bef2673.js","/mango-blog/_next/static/chunks/8fba60bd4135542a.js","/mango-blog/_next/static/chunks/caa4d2b3cb50cf17.js","/mango-blog/_next/static/chunks/b39b1f344c22c3eb.js","/mango-blog/_next/static/chunks/e1a9aaa3e8d4ba89.js","/mango-blog/_next/static/chunks/36d54e21a0527d75.js","/mango-blog/_next/static/chunks/6beefafa8f4f3a9a.js","/mango-blog/_next/static/chunks/b417336136017bb8.js"],"ClientWrapper"]
+9:I[9288,["/mango-blog/_next/static/chunks/508d891aa0792da0.js","/mango-blog/_next/static/chunks/c35a7285345f739e.js","/mango-blog/_next/static/chunks/cea628e83a0a07c2.js","/mango-blog/_next/static/chunks/311bfda68bef2673.js","/mango-blog/_next/static/chunks/8fba60bd4135542a.js","/mango-blog/_next/static/chunks/caa4d2b3cb50cf17.js","/mango-blog/_next/static/chunks/b39b1f344c22c3eb.js","/mango-blog/_next/static/chunks/e1a9aaa3e8d4ba89.js","/mango-blog/_next/static/chunks/36d54e21a0527d75.js","/mango-blog/_next/static/chunks/6beefafa8f4f3a9a.js","/mango-blog/_next/static/chunks/b417336136017bb8.js"],"HeadingAnchor"]
+a:I[34542,["/mango-blog/_next/static/chunks/508d891aa0792da0.js","/mango-blog/_next/static/chunks/c35a7285345f739e.js","/mango-blog/_next/static/chunks/cea628e83a0a07c2.js","/mango-blog/_next/static/chunks/311bfda68bef2673.js","/mango-blog/_next/static/chunks/8fba60bd4135542a.js","/mango-blog/_next/static/chunks/caa4d2b3cb50cf17.js","/mango-blog/_next/static/chunks/b39b1f344c22c3eb.js","/mango-blog/_next/static/chunks/e1a9aaa3e8d4ba89.js","/mango-blog/_next/static/chunks/36d54e21a0527d75.js","/mango-blog/_next/static/chunks/6beefafa8f4f3a9a.js","/mango-blog/_next/static/chunks/b417336136017bb8.js"],"ToggleWordWrapButton"]
+49:I[45297,["/mango-blog/_next/static/chunks/7ceea1baff856d5d.js","/mango-blog/_next/static/chunks/e1fc490196dff2be.js"],"OutletBoundary"]
+4a:"$Sreact.suspense"
+5:T1e76,---
+title: Bean Lifecycle 전체 흐름
+description: 스프링 컨테이너에서 Bean이 생성·초기화·소멸되기까지의 전체 생명주기 정리
+date: 2025-11-25
+tags:
+  - spring
+  - bean
+  - lifecycle
+  - ioc
+---
+
+# Bean Lifecycle 전체 흐름
+
+스프링 IoC 컨테이너는 **Bean의 생성 ~ 소멸까지 전 과정을 관리**한다.
+
+이 문서는 다음 관점에서 Bean 생명주기를 정리한다.
+
+1. Bean 등록 정보(BeanDefinition) 준비
+2. Bean 생성 → 의존성 주입 → 초기화
+3. 런타임 중 Bean 사용
+4. 컨텍스트 종료 시 소멸 콜백 호출
+
+---
+
+## 1. BeanDefinition 로딩 단계
+
+스프링 컨테이너는 먼저 "어떤 Bean을 만들지"에 대한 **메타 정보**를 읽어들인다.
+
+- `@ComponentScan` 으로 스캔한 클래스
+- `@Bean` 메서드가 선언된 `@Configuration` 클래스
+- XML 설정(요즘은 거의 사용 안 함)
+
+이 정보는 내부적으로 **BeanDefinition** 이라는 형태로 저장된다.
+
+<CodeLayout>
+
+```
+소스 코드 (@Component, @Bean, XML)
+        ↓
+BeanDefinition 생성
+        ↓
+ApplicationContext 내부에 BeanDefinition 등록
+```
+
+</CodeLayout>
+
+아직 이 단계에서는 **실제 객체 인스턴스는 생성되지 않은 상태**다.
+
+---
+
+## 2. Bean 생성 ~ 의존성 주입 ~ 초기화 전체 흐름
+
+컨텍스트가 초기화될 때, 스프링은 BeanDefinition 을 참고해서 Bean을 만든다.
+
+전체 흐름을 한 번에 보면 다음과 같다.
+
+<CodeLayout inner="center">
+
+```
+1) Bean 인스턴스 생성 (생성자 호출)
+2) 의존성 주입 (필드/세터/생성자)
+3) Aware 인터페이스 콜백
+4) BeanPostProcessor (before)
+5) 초기화 콜백 (@PostConstruct, afterPropertiesSet 등)
+6) BeanPostProcessor (after)
+→ 이제 컨테이너에서 사용 가능한 Bean 상태
+```
+
+</CodeLayout>
+
+각 단계를 조금 더 쪼개보자.
+
+---
+
+### 2.1 인스턴스 생성
+
+가장 먼저 **순수 Java 객체를 new로 생성**하는 단계다.
+
+- 생성자 호출
+- 아직 의존성 주입 전
+
+---
+
+### 2.2 의존성 주입(Dependency Injection)
+
+다음으로, 해당 Bean이 필요로 하는 의존성을 주입한다.
+
+- 생성자 주입
+- 필드 주입
+- Setter 주입
+
+<CodeLayout>
+
+```java
+@Component
+public class OrderService {
+
+    private final UserRepository userRepository;
+
+    public OrderService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+}
+```
+
+</CodeLayout>
+
+이 시점까지 완료되면, Bean은 필요한 의존 객체를 모두 가진 상태가 된다.
+
+---
+
+### 2.3 Aware 인터페이스 콜백 (선택)
+
+Bean이 **스프링 컨테이너의 내부 인프라 객체**에 접근해야 할 때 사용한다.
+
+예시:
+
+- `BeanNameAware` : 자신의 Bean 이름을 알고 싶을 때
+- `BeanFactoryAware` : BeanFactory 참조 필요
+- `ApplicationContextAware` : ApplicationContext 참조 필요
+
+일반 비즈니스 Bean에서는 가급적 사용을 줄이는 것이 좋다.
+
+---
+
+## 3. 초기화 단계(Init)
+
+의존성 주입이 끝난 뒤, Bean이 **실제로 사용되기 전에 마지막으로 준비 작업**을 할 수 있는 구간이다.
+
+대표적인 초기화 방법은 다음 네 가지다.
+
+1. `@PostConstruct`
+2. `InitializingBean` 인터페이스의 `afterPropertiesSet()`
+3. `@Bean(initMethod = "..." )`
+4. 커스텀 `BeanPostProcessor`
+
+---
+
+### 3.1 @PostConstruct / @PreDestroy
+
+스프링이 권장하는 방법은 **JSR-250 표준 애노테이션** 인 `@PostConstruct`, `@PreDestroy` 를 사용하는 것이다.
+
+<CodeLayout>
+
+```java
+@Component
+public class CacheInitializer {
+
+    private final CacheClient cacheClient;
+
+    public CacheInitializer(CacheClient cacheClient) {
+        this.cacheClient = cacheClient;
+    }
+
+    @PostConstruct
+    public void init() {
+        // 애플리케이션 시작 시 캐시 미리 로딩
+        cacheClient.loadInitialData();
+    }
+
+    @PreDestroy
+    public void shutdown() {
+        // 종료 전에 연결 정리 등
+        cacheClient.close();
+    }
+}
+```
+
+</CodeLayout>
+
+특징:
+
+- 의존성 주입이 끝난 직후 `@PostConstruct` 가 1회 호출
+- 컨텍스트 종료 직전에 `@PreDestroy` 가 1회 호출
+
+---
+
+### 3.2 InitializingBean / DisposableBean
+
+인터페이스를 구현하여 초기화/소멸 콜백을 받을 수도 있다.
+
+<CodeLayout>
+
+```java
+@Component
+public class ReportSender implements InitializingBean, DisposableBean {
+
+    @Override
+    public void afterPropertiesSet() {
+        // 초기화 로직
+    }
+
+    @Override
+    public void destroy() {
+        // 소멸 로직
+    }
+}
+```
+
+</CodeLayout>
+
+단점:
+
+- 스프링 인터페이스에 직접 의존 → **도메인 코드가 스프링에 묶인다**
+- 요즘은 사용 빈도가 낮고, 가급적 `@PostConstruct`, `@PreDestroy` 를 우선 사용
+
+---
+
+### 3.3 @Bean(initMethod, destroyMethod)
+
+자바 설정에서 `@Bean` 을 사용할 때, 초기화/소멸 메서드를 지정할 수 있다.
+
+<CodeLayout>
+
+```java
+@Configuration
+public class AppConfig {
+
+    @Bean(initMethod = "connect", destroyMethod = "disconnect")
+    public ExternalApiClient externalApiClient() {
+        return new ExternalApiClient("https://api.example.com");
+    }
+}
+```
+
+</CodeLayout>
+
+- 스프링 코드 의존 없이, **순수 POJO 메서드 이름만으로 라이프사이클 지정**이 가능하다.
+
+---
+
+## 4. BeanPostProcessor — AOP가 끼어드는 지점
+
+`BeanPostProcessor` 는 **Bean의 초기화 전/후에 개입할 수 있는 확장 포인트**다.
+
+AOP, `@Transactional`, `@Async` 등 스프링의 강력한 기능들은 대부분 이 시점에 프록시를 입힌다.
+
+<CodeLayout>
+
+```java
+public class CustomLoggerPostProcessor implements BeanPostProcessor {
+
+    @Override
+    public Object postProcessBeforeInitialization(Object bean, String beanName) {
+        // 초기화 전에 수행할 로직
+        return bean;
+    }
+
+    @Override
+    public Object postProcessAfterInitialization(Object bean, String beanName) {
+        // 초기화 후에 프록시 감싸기 등
+        return bean;
+    }
+}
+```
+
+</CodeLayout>
+
+실무에서는 직접 구현하기보다는, "이 타이밍에 무언가가 일어난다" 정도만 이해하고
+AOP, 트랜잭션이 **BeanPostProcessor 기반으로 동작**한다는 사실을 기억하면 충분하다.
+
+---
+
+## 5. 소멸(Destroy) 단계
+
+애플리케이션 종료 시점 또는 컨텍스트 종료 시점에 Bean 소멸 콜백이 호출된다.
+
+소멸 시에는 다음과 같은 콜백이 호출될 수 있다.
+
+- `@PreDestroy`
+- `DisposableBean.destroy()`
+- `@Bean`의 `destroyMethod`
+
+이 단계에서 주로 하는 일:
+
+- DB 커넥션 풀 정리
+- 외부 소켓/네트워크 자원 해제
+- 쓰레드풀 shutdown
+
+---
+
+## 6. 전체 Bean Lifecycle 요약
+
+<CodeLayout inner="center">
+
+```
+1. BeanDefinition 로딩
+2. Bean 인스턴스 생성 (생성자)
+3. 의존성 주입 (DI)
+4. Aware 콜백
+5. BeanPostProcessor(before)
+6. 초기화 콜백 (@PostConstruct, afterPropertiesSet, initMethod)
+7. BeanPostProcessor(after)
+→ 애플리케이션에서 Bean 사용
+8. 컨텍스트 종료 시 소멸 콜백 (@PreDestroy, destroy, destroyMethod)
+```
+
+</CodeLayout>
+
+---
+
+## 7. 실무 기준 핵심 정리
+
+- 비즈니스 Bean에서는 **`@PostConstruct` / `@PreDestroy`** 를 우선 사용한다.
+- 외부 리소스(소켓, 커넥션, 스레드풀)를 다루는 Bean은 **소멸 콜백을 반드시 구현**해야 한다.
+- 라이프사이클 전체를 이해하면, AOP/트랜잭션/리소스 관리가 **어디에 얹혀 동작하는지** 한눈에 보인다.
+- BeanPostProcessor는 내부적으로 매우 많이 쓰이지만, 직접 구현할 일은 드물다.
+- "생성 → 주입 → 초기화 → 사용 → 소멸" 흐름만 명확하게 머릿속에 그려지면, 나머지는 구현 디테일이다.0:{"buildId":"uaExnbQ2pT_-jQkaFTBLZ","rsc":["$","$1","c",{"children":[["$","div",null,{"className":"x:mx-auto x:flex x:max-w-(--nextra-content-width)","children":["$","$L2",null,{"value":[{"value":"1. BeanDefinition 로딩 단계","id":"1-beandefinition-로딩-단계","depth":2},{"value":"2. Bean 생성 ~ 의존성 주입 ~ 초기화 전체 흐름","id":"2-bean-생성--의존성-주입--초기화-전체-흐름","depth":2},{"value":"2.1 인스턴스 생성","id":"21-인스턴스-생성","depth":3},{"value":"2.2 의존성 주입(Dependency Injection)","id":"22-의존성-주입dependency-injection","depth":3},{"value":"2.3 Aware 인터페이스 콜백 (선택)","id":"23-aware-인터페이스-콜백-선택","depth":3},{"value":"3. 초기화 단계(Init)","id":"3-초기화-단계init","depth":2},{"value":"3.1 @PostConstruct / @PreDestroy","id":"31-postconstruct--predestroy","depth":3},{"value":"3.2 InitializingBean / DisposableBean","id":"32-initializingbean--disposablebean","depth":3},{"value":"3.3 @Bean(initMethod, destroyMethod)","id":"33-beaninitmethod-destroymethod","depth":3},{"value":"4. BeanPostProcessor — AOP가 끼어드는 지점","id":"4-beanpostprocessor--aop가-끼어드는-지점","depth":2},{"value":"5. 소멸(Destroy) 단계","id":"5-소멸destroy-단계","depth":2},{"value":"6. 전체 Bean Lifecycle 요약","id":"6-전체-bean-lifecycle-요약","depth":2},{"value":"7. 실무 기준 핵심 정리","id":"7-실무-기준-핵심-정리","depth":2}],"children":[["$","$L3",null,{}],["$","$L4",null,{"metadata":{"title":"Bean Lifecycle 전체 흐름","description":"스프링 컨테이너에서 Bean이 생성·초기화·소멸되기까지의 전체 생명주기 정리","date":"2025-11-25","tags":["spring","bean","lifecycle","ioc"],"filePath":"src/content/springboot/01-spring-core/3-bean-lifecycle.mdx"},"sourceCode":"$5","children":["$L6","$L7"]}]]}]}],null,"$L8"]}],"loading":null,"isPartial":false}
+6:["$","div",null,{"id":"nextra-skip-nav"}]
+7:["$","main",null,{"data-pagefind-body":true,"children":[["$","h1",null,{"className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-bold x:mt-2 x:text-4xl","children":["Bean Lifecycle 전체 흐름","$undefined"]}],"\n",["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":["스프링 IoC 컨테이너는 ",["$","strong",null,{"children":"Bean의 생성 ~ 소멸까지 전 과정을 관리"}],"한다."]}],"\n",["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"이 문서는 다음 관점에서 Bean 생명주기를 정리한다."}],"\n",["$","ol",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-decimal x:ms-6","children":["\n",["$","li",null,{"className":"x:my-[.5em]","children":"Bean 등록 정보(BeanDefinition) 준비"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"Bean 생성 → 의존성 주입 → 초기화"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"런타임 중 Bean 사용"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"컨텍스트 종료 시 소멸 콜백 호출"}],"\n"]}],"\n",["$","hr",null,{"className":"x:my-[2em] nextra-border"}],"\n",["$","h2",null,{"id":"1-beandefinition-로딩-단계","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-10 x:border-b x:pb-1 x:text-3xl nextra-border","children":["1. BeanDefinition 로딩 단계",["$","$L9",null,{"id":"1-beandefinition-로딩-단계"}]]}],"\n",["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":["스프링 컨테이너는 먼저 “어떤 Bean을 만들지”에 대한 ",["$","strong",null,{"children":"메타 정보"}],"를 읽어들인다."]}],"\n",["$","ul",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-disc x:ms-[1.5em]","children":["\n",["$","li",null,{"className":"x:my-[.5em]","children":[["$","code",null,{"className":"nextra-code","dir":"ltr","children":"@ComponentScan"}]," 으로 스캔한 클래스"]}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":[["$","code",null,{"className":"nextra-code","dir":"ltr","children":"@Bean"}]," 메서드가 선언된 ",["$","code",null,{"className":"nextra-code","dir":"ltr","children":"@Configuration"}]," 클래스"]}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"XML 설정(요즘은 거의 사용 안 함)"}],"\n"]}],"\n",["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":["이 정보는 내부적으로 ",["$","strong",null,{"children":"BeanDefinition"}]," 이라는 형태로 저장된다."]}],"\n",["$","div",null,{"className":"flex justify-start","children":["$","div",null,{"className":"inline-block text-left","children":["$","div",null,{"data-pagefind-ignore":"all","className":"nextra-code x:relative x:not-first:mt-[1.25em]","children":["$undefined",["$","pre",null,{"className":"x:group x:focus-visible:nextra-focus x:overflow-x-auto x:subpixel-antialiased x:text-[.9em] x:bg-white x:dark:bg-black x:py-4 x:ring-1 x:ring-inset x:ring-gray-300 x:dark:ring-neutral-700 x:contrast-more:ring-gray-900 x:contrast-more:dark:ring-gray-50 x:contrast-more:contrast-150 x:rounded-md not-prose","tabIndex":"0","children":[["$","div",null,{"className":"x:group-hover:opacity-100 x:group-focus:opacity-100 x:opacity-0 x:transition x:focus-within:opacity-100 x:flex x:gap-1 x:absolute x:right-4 x:top-2","children":[["$","$La",null,{"children":["$","svg",null,{"viewBox":"0 0 24 24","fill":"currentColor","height":"1em","children":["$","path",null,{"d":"M4 19h6v-2H4v2zM20 5H4v2h16V5zm-3 6H4v2h13.25c1.1 0 2 .9 2 2s-.9 2-2 2H15v-2l-3 3l3 3v-2h2c2.21 0 4-1.79 4-4s-1.79-4-4-4z"}]}]}],false]}],["$","code",null,{"className":"nextra-code","dir":"ltr","children":[["$","span",null,{"children":["$","span",null,{"children":"소스 코드 (@Component, @Bean, XML)"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"        ↓"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"BeanDefinition 생성"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"        ↓"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"ApplicationContext 내부에 BeanDefinition 등록"}]}]]}]]}]]}]}]}],"\n",["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":["아직 이 단계에서는 ",["$","strong",null,{"children":"실제 객체 인스턴스는 생성되지 않은 상태"}],"다."]}],"\n",["$","hr",null,{"className":"x:my-[2em] nextra-border"}],"\n",["$","h2",null,{"id":"2-bean-생성--의존성-주입--초기화-전체-흐름","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-10 x:border-b x:pb-1 x:text-3xl nextra-border","children":["2. Bean 생성 ~ 의존성 주입 ~ 초기화 전체 흐름","$Lb"]}],"\n","$Lc","\n","$Ld","\n","$Le","\n","$Lf","\n","$L10","\n","$L11","\n","$L12","\n","$L13","\n","$L14","\n","$L15","\n","$L16","\n","$L17","\n","$L18","\n","$L19","\n","$L1a","\n","$L1b","\n","$L1c","\n","$L1d","\n","$L1e","\n","$L1f","\n","$L20","\n","$L21","\n","$L22","\n","$L23","\n","$L24","\n","$L25","\n","$L26","\n","$L27","\n","$L28","\n","$L29","\n","$L2a","\n","$L2b","\n","$L2c","\n","$L2d","\n","$L2e","\n","$L2f","\n","$L30","\n","$L31","\n","$L32","\n","$L33","\n","$L34","\n","$L35","\n","$L36","\n","$L37","\n","$L38","\n","$L39","\n","$L3a","\n","$L3b","\n","$L3c","\n","$L3d","\n","$L3e","\n","$L3f","\n","$L40","\n","$L41","\n","$L42","\n","$L43","\n","$L44","\n","$L45","\n","$L46","\n","$L47","\n","$L48"]}]
+8:["$","$L49",null,{"children":["$","$4a",null,{"name":"Next.MetadataOutlet","children":"$@4b"}]}]
+b:["$","$L9",null,{"id":"2-bean-생성--의존성-주입--초기화-전체-흐름"}]
+c:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"컨텍스트가 초기화될 때, 스프링은 BeanDefinition 을 참고해서 Bean을 만든다."}]
+d:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"전체 흐름을 한 번에 보면 다음과 같다."}]
+e:["$","div",null,{"className":"flex justify-start","children":["$","div",null,{"className":"inline-block text-center","children":["$","div",null,{"data-pagefind-ignore":"all","className":"nextra-code x:relative x:not-first:mt-[1.25em]","children":["$undefined",["$","pre",null,{"className":"x:group x:focus-visible:nextra-focus x:overflow-x-auto x:subpixel-antialiased x:text-[.9em] x:bg-white x:dark:bg-black x:py-4 x:ring-1 x:ring-inset x:ring-gray-300 x:dark:ring-neutral-700 x:contrast-more:ring-gray-900 x:contrast-more:dark:ring-gray-50 x:contrast-more:contrast-150 x:rounded-md not-prose","tabIndex":"0","children":[["$","div",null,{"className":"x:group-hover:opacity-100 x:group-focus:opacity-100 x:opacity-0 x:transition x:focus-within:opacity-100 x:flex x:gap-1 x:absolute x:right-4 x:top-2","children":[["$","$La",null,{"children":["$","svg",null,{"viewBox":"0 0 24 24","fill":"currentColor","height":"1em","children":["$","path",null,{"d":"M4 19h6v-2H4v2zM20 5H4v2h16V5zm-3 6H4v2h13.25c1.1 0 2 .9 2 2s-.9 2-2 2H15v-2l-3 3l3 3v-2h2c2.21 0 4-1.79 4-4s-1.79-4-4-4z"}]}]}],false]}],["$","code",null,{"className":"nextra-code","dir":"ltr","children":[["$","span",null,{"children":["$","span",null,{"children":"1) Bean 인스턴스 생성 (생성자 호출)"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"2) 의존성 주입 (필드/세터/생성자)"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"3) Aware 인터페이스 콜백"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"4) BeanPostProcessor (before)"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"5) 초기화 콜백 (@PostConstruct, afterPropertiesSet 등)"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"6) BeanPostProcessor (after)"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"→ 이제 컨테이너에서 사용 가능한 Bean 상태"}]}]]}]]}]]}]}]}]
+f:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"각 단계를 조금 더 쪼개보자."}]
+10:["$","hr",null,{"className":"x:my-[2em] nextra-border"}]
+11:["$","h3",null,{"id":"21-인스턴스-생성","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-8 x:text-2xl","children":["2.1 인스턴스 생성",["$","$L9",null,{"id":"21-인스턴스-생성"}]]}]
+12:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":["가장 먼저 ",["$","strong",null,{"children":"순수 Java 객체를 new로 생성"}],"하는 단계다."]}]
+13:["$","ul",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-disc x:ms-[1.5em]","children":["\n",["$","li",null,{"className":"x:my-[.5em]","children":"생성자 호출"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"아직 의존성 주입 전"}],"\n"]}]
+14:["$","hr",null,{"className":"x:my-[2em] nextra-border"}]
+15:["$","h3",null,{"id":"22-의존성-주입dependency-injection","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-8 x:text-2xl","children":["2.2 의존성 주입(Dependency Injection)",["$","$L9",null,{"id":"22-의존성-주입dependency-injection"}]]}]
+16:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"다음으로, 해당 Bean이 필요로 하는 의존성을 주입한다."}]
+17:["$","ul",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-disc x:ms-[1.5em]","children":["\n",["$","li",null,{"className":"x:my-[.5em]","children":"생성자 주입"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"필드 주입"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"Setter 주입"}],"\n"]}]
+18:["$","div",null,{"className":"flex justify-start","children":["$","div",null,{"className":"inline-block text-left","children":["$","div",null,{"data-pagefind-ignore":"all","className":"nextra-code x:relative x:not-first:mt-[1.25em]","children":["$undefined",["$","pre",null,{"className":"x:group x:focus-visible:nextra-focus x:overflow-x-auto x:subpixel-antialiased x:text-[.9em] x:bg-white x:dark:bg-black x:py-4 x:ring-1 x:ring-inset x:ring-gray-300 x:dark:ring-neutral-700 x:contrast-more:ring-gray-900 x:contrast-more:dark:ring-gray-50 x:contrast-more:contrast-150 x:rounded-md not-prose","tabIndex":"0","children":[["$","div",null,{"className":"x:group-hover:opacity-100 x:group-focus:opacity-100 x:opacity-0 x:transition x:focus-within:opacity-100 x:flex x:gap-1 x:absolute x:right-4 x:top-2","children":[["$","$La",null,{"children":["$","svg",null,{"viewBox":"0 0 24 24","fill":"currentColor","height":"1em","children":["$","path",null,{"d":"M4 19h6v-2H4v2zM20 5H4v2h16V5zm-3 6H4v2h13.25c1.1 0 2 .9 2 2s-.9 2-2 2H15v-2l-3 3l3 3v-2h2c2.21 0 4-1.79 4-4s-1.79-4-4-4z"}]}]}],false]}],["$","code",null,{"className":"nextra-code","dir":"ltr","children":[["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"@"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"Component"}]]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"public"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":" class"}],["$","span",null,{"style":{"--shiki-light":"#6F42C1","--shiki-dark":"#B392F0"},"children":" OrderService"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":" {"}]]}],"\n",["$","span",null,{"children":" "}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"    private"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":" final"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":" UserRepository userRepository;"}]]}],"\n",["$","span",null,{"children":" "}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"    public"}],["$","span",null,{"style":{"--shiki-light":"#6F42C1","--shiki-dark":"#B392F0"},"children":" OrderService"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"(UserRepository "}],["$","span",null,{"style":{"--shiki-light":"#E36209","--shiki-dark":"#FFAB70"},"children":"userRepository"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":") {"}]]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#005CC5","--shiki-dark":"#79B8FF"},"children":"        this"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":".userRepository "}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"="}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":" userRepository;"}]]}],"\n",["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"    }"}]}],"\n",["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"}"}]}]]}]]}]]}]}]}]
+19:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"이 시점까지 완료되면, Bean은 필요한 의존 객체를 모두 가진 상태가 된다."}]
+1a:["$","hr",null,{"className":"x:my-[2em] nextra-border"}]
+1b:["$","h3",null,{"id":"23-aware-인터페이스-콜백-선택","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-8 x:text-2xl","children":["2.3 Aware 인터페이스 콜백 (선택)",["$","$L9",null,{"id":"23-aware-인터페이스-콜백-선택"}]]}]
+1c:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":["Bean이 ",["$","strong",null,{"children":"스프링 컨테이너의 내부 인프라 객체"}],"에 접근해야 할 때 사용한다."]}]
+1d:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"예시:"}]
+1e:["$","ul",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-disc x:ms-[1.5em]","children":["\n",["$","li",null,{"className":"x:my-[.5em]","children":[["$","code",null,{"className":"nextra-code","dir":"ltr","children":"BeanNameAware"}]," : 자신의 Bean 이름을 알고 싶을 때"]}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":[["$","code",null,{"className":"nextra-code","dir":"ltr","children":"BeanFactoryAware"}]," : BeanFactory 참조 필요"]}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":[["$","code",null,{"className":"nextra-code","dir":"ltr","children":"ApplicationContextAware"}]," : ApplicationContext 참조 필요"]}],"\n"]}]
+1f:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"일반 비즈니스 Bean에서는 가급적 사용을 줄이는 것이 좋다."}]
+20:["$","hr",null,{"className":"x:my-[2em] nextra-border"}]
+21:["$","h2",null,{"id":"3-초기화-단계init","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-10 x:border-b x:pb-1 x:text-3xl nextra-border","children":["3. 초기화 단계(Init)",["$","$L9",null,{"id":"3-초기화-단계init"}]]}]
+22:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":["의존성 주입이 끝난 뒤, Bean이 ",["$","strong",null,{"children":"실제로 사용되기 전에 마지막으로 준비 작업"}],"을 할 수 있는 구간이다."]}]
+23:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"대표적인 초기화 방법은 다음 네 가지다."}]
+24:["$","ol",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-decimal x:ms-6","children":["\n",["$","li",null,{"className":"x:my-[.5em]","children":["$","code",null,{"className":"nextra-code","dir":"ltr","children":"@PostConstruct"}]}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":[["$","code",null,{"className":"nextra-code","dir":"ltr","children":"InitializingBean"}]," 인터페이스의 ",["$","code",null,{"className":"nextra-code","dir":"ltr","children":"afterPropertiesSet()"}]]}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":["$","code",null,{"className":"nextra-code","dir":"ltr","children":"@Bean(initMethod = \"...\" )"}]}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":["커스텀 ",["$","code",null,{"className":"nextra-code","dir":"ltr","children":"BeanPostProcessor"}]]}],"\n"]}]
+25:["$","hr",null,{"className":"x:my-[2em] nextra-border"}]
+26:["$","h3",null,{"id":"31-postconstruct--predestroy","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-8 x:text-2xl","children":["3.1 @PostConstruct / @PreDestroy",["$","$L9",null,{"id":"31-postconstruct--predestroy"}]]}]
+27:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":["스프링이 권장하는 방법은 ",["$","strong",null,{"children":"JSR-250 표준 애노테이션"}]," 인 ",["$","code",null,{"className":"nextra-code","dir":"ltr","children":"@PostConstruct"}],", ",["$","code",null,{"className":"nextra-code","dir":"ltr","children":"@PreDestroy"}]," 를 사용하는 것이다."]}]
+28:["$","div",null,{"className":"flex justify-start","children":["$","div",null,{"className":"inline-block text-left","children":["$","div",null,{"data-pagefind-ignore":"all","className":"nextra-code x:relative x:not-first:mt-[1.25em]","children":["$undefined",["$","pre",null,{"className":"x:group x:focus-visible:nextra-focus x:overflow-x-auto x:subpixel-antialiased x:text-[.9em] x:bg-white x:dark:bg-black x:py-4 x:ring-1 x:ring-inset x:ring-gray-300 x:dark:ring-neutral-700 x:contrast-more:ring-gray-900 x:contrast-more:dark:ring-gray-50 x:contrast-more:contrast-150 x:rounded-md not-prose","tabIndex":"0","children":[["$","div",null,{"className":"x:group-hover:opacity-100 x:group-focus:opacity-100 x:opacity-0 x:transition x:focus-within:opacity-100 x:flex x:gap-1 x:absolute x:right-4 x:top-2","children":[["$","$La",null,{"children":["$","svg",null,{"viewBox":"0 0 24 24","fill":"currentColor","height":"1em","children":["$","path",null,{"d":"M4 19h6v-2H4v2zM20 5H4v2h16V5zm-3 6H4v2h13.25c1.1 0 2 .9 2 2s-.9 2-2 2H15v-2l-3 3l3 3v-2h2c2.21 0 4-1.79 4-4s-1.79-4-4-4z"}]}]}],false]}],["$","code",null,{"className":"nextra-code","dir":"ltr","children":[["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"@"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"Component"}]]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"public"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":" class"}],["$","span",null,{"style":{"--shiki-light":"#6F42C1","--shiki-dark":"#B392F0"},"children":" CacheInitializer"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":" {"}]]}],"\n",["$","span",null,{"children":" "}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"    private"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":" final"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":" CacheClient cacheClient;"}]]}],"\n",["$","span",null,{"children":" "}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"    public"}],["$","span",null,{"style":{"--shiki-light":"#6F42C1","--shiki-dark":"#B392F0"},"children":" CacheInitializer"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"(CacheClient "}],["$","span",null,{"style":{"--shiki-light":"#E36209","--shiki-dark":"#FFAB70"},"children":"cacheClient"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":") {"}]]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#005CC5","--shiki-dark":"#79B8FF"},"children":"        this"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":".cacheClient "}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"="}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":" cacheClient;"}]]}],"\n",["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"    }"}]}],"\n",["$","span",null,{"children":" "}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"    @"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"PostConstruct"}]]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"    public"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":" void"}],["$","span",null,{"style":{"--shiki-light":"#6F42C1","--shiki-dark":"#B392F0"},"children":" init"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"() {"}]]}],"\n",["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#6A737D","--shiki-dark":"#6A737D"},"children":"        // 애플리케이션 시작 시 캐시 미리 로딩"}]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"        cacheClient."}],["$","span",null,{"style":{"--shiki-light":"#6F42C1","--shiki-dark":"#B392F0"},"children":"loadInitialData"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"();"}]]}],"\n","$L4c","\n","$L4d","\n","$L4e","\n","$L4f","\n","$L50","\n","$L51","\n","$L52","\n","$L53"]}]]}]]}]}]}]
+29:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"특징:"}]
+2a:["$","ul",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-disc x:ms-[1.5em]","children":["\n",["$","li",null,{"className":"x:my-[.5em]","children":["의존성 주입이 끝난 직후 ",["$","code",null,{"className":"nextra-code","dir":"ltr","children":"@PostConstruct"}]," 가 1회 호출"]}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":["컨텍스트 종료 직전에 ",["$","code",null,{"className":"nextra-code","dir":"ltr","children":"@PreDestroy"}]," 가 1회 호출"]}],"\n"]}]
+2b:["$","hr",null,{"className":"x:my-[2em] nextra-border"}]
+2c:["$","h3",null,{"id":"32-initializingbean--disposablebean","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-8 x:text-2xl","children":["3.2 InitializingBean / DisposableBean",["$","$L9",null,{"id":"32-initializingbean--disposablebean"}]]}]
+2d:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"인터페이스를 구현하여 초기화/소멸 콜백을 받을 수도 있다."}]
+2e:["$","div",null,{"className":"flex justify-start","children":["$","div",null,{"className":"inline-block text-left","children":["$","div",null,{"data-pagefind-ignore":"all","className":"nextra-code x:relative x:not-first:mt-[1.25em]","children":["$undefined",["$","pre",null,{"className":"x:group x:focus-visible:nextra-focus x:overflow-x-auto x:subpixel-antialiased x:text-[.9em] x:bg-white x:dark:bg-black x:py-4 x:ring-1 x:ring-inset x:ring-gray-300 x:dark:ring-neutral-700 x:contrast-more:ring-gray-900 x:contrast-more:dark:ring-gray-50 x:contrast-more:contrast-150 x:rounded-md not-prose","tabIndex":"0","children":[["$","div",null,{"className":"x:group-hover:opacity-100 x:group-focus:opacity-100 x:opacity-0 x:transition x:focus-within:opacity-100 x:flex x:gap-1 x:absolute x:right-4 x:top-2","children":[["$","$La",null,{"children":["$","svg",null,{"viewBox":"0 0 24 24","fill":"currentColor","height":"1em","children":["$","path",null,{"d":"M4 19h6v-2H4v2zM20 5H4v2h16V5zm-3 6H4v2h13.25c1.1 0 2 .9 2 2s-.9 2-2 2H15v-2l-3 3l3 3v-2h2c2.21 0 4-1.79 4-4s-1.79-4-4-4z"}]}]}],false]}],["$","code",null,{"className":"nextra-code","dir":"ltr","children":[["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"@"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"Component"}]]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"public"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":" class"}],["$","span",null,{"style":{"--shiki-light":"#6F42C1","--shiki-dark":"#B392F0"},"children":" ReportSender"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":" implements"}],["$","span",null,{"style":{"--shiki-light":"#6F42C1","--shiki-dark":"#B392F0"},"children":" InitializingBean"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":", "}],["$","span",null,{"style":{"--shiki-light":"#6F42C1","--shiki-dark":"#B392F0"},"children":"DisposableBean"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":" {"}]]}],"\n",["$","span",null,{"children":" "}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"    @"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"Override"}]]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"    public"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":" void"}],["$","span",null,{"style":{"--shiki-light":"#6F42C1","--shiki-dark":"#B392F0"},"children":" afterPropertiesSet"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"() {"}]]}],"\n",["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#6A737D","--shiki-dark":"#6A737D"},"children":"        // 초기화 로직"}]}],"\n",["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"    }"}]}],"\n",["$","span",null,{"children":" "}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"    @"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"Override"}]]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"    public"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":" void"}],["$","span",null,{"style":{"--shiki-light":"#6F42C1","--shiki-dark":"#B392F0"},"children":" destroy"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"() {"}]]}],"\n",["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#6A737D","--shiki-dark":"#6A737D"},"children":"        // 소멸 로직"}]}],"\n",["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"    }"}]}],"\n",["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"}"}]}]]}]]}]]}]}]}]
+2f:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"단점:"}]
+30:["$","ul",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-disc x:ms-[1.5em]","children":["\n",["$","li",null,{"className":"x:my-[.5em]","children":["스프링 인터페이스에 직접 의존 → ",["$","strong",null,{"children":"도메인 코드가 스프링에 묶인다"}]]}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":["요즘은 사용 빈도가 낮고, 가급적 ",["$","code",null,{"className":"nextra-code","dir":"ltr","children":"@PostConstruct"}],", ",["$","code",null,{"className":"nextra-code","dir":"ltr","children":"@PreDestroy"}]," 를 우선 사용"]}],"\n"]}]
+31:["$","hr",null,{"className":"x:my-[2em] nextra-border"}]
+32:["$","h3",null,{"id":"33-beaninitmethod-destroymethod","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-8 x:text-2xl","children":["3.3 @Bean(initMethod, destroyMethod)",["$","$L9",null,{"id":"33-beaninitmethod-destroymethod"}]]}]
+33:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":["자바 설정에서 ",["$","code",null,{"className":"nextra-code","dir":"ltr","children":"@Bean"}]," 을 사용할 때, 초기화/소멸 메서드를 지정할 수 있다."]}]
+34:["$","div",null,{"className":"flex justify-start","children":["$","div",null,{"className":"inline-block text-left","children":["$","div",null,{"data-pagefind-ignore":"all","className":"nextra-code x:relative x:not-first:mt-[1.25em]","children":["$undefined",["$","pre",null,{"className":"x:group x:focus-visible:nextra-focus x:overflow-x-auto x:subpixel-antialiased x:text-[.9em] x:bg-white x:dark:bg-black x:py-4 x:ring-1 x:ring-inset x:ring-gray-300 x:dark:ring-neutral-700 x:contrast-more:ring-gray-900 x:contrast-more:dark:ring-gray-50 x:contrast-more:contrast-150 x:rounded-md not-prose","tabIndex":"0","children":[["$","div",null,{"className":"x:group-hover:opacity-100 x:group-focus:opacity-100 x:opacity-0 x:transition x:focus-within:opacity-100 x:flex x:gap-1 x:absolute x:right-4 x:top-2","children":[["$","$La",null,{"children":["$","svg",null,{"viewBox":"0 0 24 24","fill":"currentColor","height":"1em","children":["$","path",null,{"d":"M4 19h6v-2H4v2zM20 5H4v2h16V5zm-3 6H4v2h13.25c1.1 0 2 .9 2 2s-.9 2-2 2H15v-2l-3 3l3 3v-2h2c2.21 0 4-1.79 4-4s-1.79-4-4-4z"}]}]}],false]}],["$","code",null,{"className":"nextra-code","dir":"ltr","children":[["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"@"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"Configuration"}]]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"public"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":" class"}],["$","span",null,{"style":{"--shiki-light":"#6F42C1","--shiki-dark":"#B392F0"},"children":" AppConfig"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":" {"}]]}],"\n",["$","span",null,{"children":" "}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"    @"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"Bean"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"("}],["$","span",null,{"style":{"--shiki-light":"#005CC5","--shiki-dark":"#79B8FF"},"children":"initMethod"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":" ="}],["$","span",null,{"style":{"--shiki-light":"#032F62","--shiki-dark":"#9ECBFF"},"children":" \"connect\""}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":", "}],["$","span",null,{"style":{"--shiki-light":"#005CC5","--shiki-dark":"#79B8FF"},"children":"destroyMethod"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":" ="}],["$","span",null,{"style":{"--shiki-light":"#032F62","--shiki-dark":"#9ECBFF"},"children":" \"disconnect\""}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":")"}]]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"    public"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":" ExternalApiClient "}],["$","span",null,{"style":{"--shiki-light":"#6F42C1","--shiki-dark":"#B392F0"},"children":"externalApiClient"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"() {"}]]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"        return"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":" new"}],["$","span",null,{"style":{"--shiki-light":"#6F42C1","--shiki-dark":"#B392F0"},"children":" ExternalApiClient"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"("}],["$","span",null,{"style":{"--shiki-light":"#032F62","--shiki-dark":"#9ECBFF"},"children":"\"https://api.example.com\""}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":");"}]]}],"\n",["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"    }"}]}],"\n",["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"}"}]}]]}]]}]]}]}]}]
+35:["$","ul",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-disc x:ms-[1.5em]","children":["\n",["$","li",null,{"className":"x:my-[.5em]","children":["스프링 코드 의존 없이, ",["$","strong",null,{"children":"순수 POJO 메서드 이름만으로 라이프사이클 지정"}],"이 가능하다."]}],"\n"]}]
+36:["$","hr",null,{"className":"x:my-[2em] nextra-border"}]
+37:["$","h2",null,{"id":"4-beanpostprocessor--aop가-끼어드는-지점","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-10 x:border-b x:pb-1 x:text-3xl nextra-border","children":["4. BeanPostProcessor — AOP가 끼어드는 지점",["$","$L9",null,{"id":"4-beanpostprocessor--aop가-끼어드는-지점"}]]}]
+38:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":[["$","code",null,{"className":"nextra-code","dir":"ltr","children":"BeanPostProcessor"}]," 는 ",["$","strong",null,{"children":"Bean의 초기화 전/후에 개입할 수 있는 확장 포인트"}],"다."]}]
+39:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":["AOP, ",["$","code",null,{"className":"nextra-code","dir":"ltr","children":"@Transactional"}],", ",["$","code",null,{"className":"nextra-code","dir":"ltr","children":"@Async"}]," 등 스프링의 강력한 기능들은 대부분 이 시점에 프록시를 입힌다."]}]
+3a:["$","div",null,{"className":"flex justify-start","children":["$","div",null,{"className":"inline-block text-left","children":["$","div",null,{"data-pagefind-ignore":"all","className":"nextra-code x:relative x:not-first:mt-[1.25em]","children":["$undefined",["$","pre",null,{"className":"x:group x:focus-visible:nextra-focus x:overflow-x-auto x:subpixel-antialiased x:text-[.9em] x:bg-white x:dark:bg-black x:py-4 x:ring-1 x:ring-inset x:ring-gray-300 x:dark:ring-neutral-700 x:contrast-more:ring-gray-900 x:contrast-more:dark:ring-gray-50 x:contrast-more:contrast-150 x:rounded-md not-prose","tabIndex":"0","children":[["$","div",null,{"className":"x:group-hover:opacity-100 x:group-focus:opacity-100 x:opacity-0 x:transition x:focus-within:opacity-100 x:flex x:gap-1 x:absolute x:right-4 x:top-2","children":[["$","$La",null,{"children":["$","svg",null,{"viewBox":"0 0 24 24","fill":"currentColor","height":"1em","children":["$","path",null,{"d":"M4 19h6v-2H4v2zM20 5H4v2h16V5zm-3 6H4v2h13.25c1.1 0 2 .9 2 2s-.9 2-2 2H15v-2l-3 3l3 3v-2h2c2.21 0 4-1.79 4-4s-1.79-4-4-4z"}]}]}],false]}],["$","code",null,{"className":"nextra-code","dir":"ltr","children":[["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"public"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":" class"}],["$","span",null,{"style":{"--shiki-light":"#6F42C1","--shiki-dark":"#B392F0"},"children":" CustomLoggerPostProcessor"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":" implements"}],["$","span",null,{"style":{"--shiki-light":"#6F42C1","--shiki-dark":"#B392F0"},"children":" BeanPostProcessor"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":" {"}]]}],"\n",["$","span",null,{"children":" "}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"    @"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"Override"}]]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"    public"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":" Object "}],["$","span",null,{"style":{"--shiki-light":"#6F42C1","--shiki-dark":"#B392F0"},"children":"postProcessBeforeInitialization"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"(Object "}],["$","span",null,{"style":{"--shiki-light":"#E36209","--shiki-dark":"#FFAB70"},"children":"bean"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":", String "}],["$","span",null,{"style":{"--shiki-light":"#E36209","--shiki-dark":"#FFAB70"},"children":"beanName"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":") {"}]]}],"\n",["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#6A737D","--shiki-dark":"#6A737D"},"children":"        // 초기화 전에 수행할 로직"}]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"        return"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":" bean;"}]]}],"\n",["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"    }"}]}],"\n",["$","span",null,{"children":" "}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"    @"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"Override"}]]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"    public"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":" Object "}],["$","span",null,{"style":{"--shiki-light":"#6F42C1","--shiki-dark":"#B392F0"},"children":"postProcessAfterInitialization"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"(Object "}],["$","span",null,{"style":{"--shiki-light":"#E36209","--shiki-dark":"#FFAB70"},"children":"bean"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":", String "}],["$","span",null,{"style":{"--shiki-light":"#E36209","--shiki-dark":"#FFAB70"},"children":"beanName"}],"$L54"]}],"\n","$L55","\n","$L56","\n","$L57","\n","$L58"]}]]}]]}]}]}]
+3b:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":["실무에서는 직접 구현하기보다는, “이 타이밍에 무언가가 일어난다” 정도만 이해하고\nAOP, 트랜잭션이 ",["$","strong",null,{"children":"BeanPostProcessor 기반으로 동작"}],"한다는 사실을 기억하면 충분하다."]}]
+3c:["$","hr",null,{"className":"x:my-[2em] nextra-border"}]
+3d:["$","h2",null,{"id":"5-소멸destroy-단계","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-10 x:border-b x:pb-1 x:text-3xl nextra-border","children":["5. 소멸(Destroy) 단계",["$","$L9",null,{"id":"5-소멸destroy-단계"}]]}]
+3e:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"애플리케이션 종료 시점 또는 컨텍스트 종료 시점에 Bean 소멸 콜백이 호출된다."}]
+3f:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"소멸 시에는 다음과 같은 콜백이 호출될 수 있다."}]
+40:["$","ul",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-disc x:ms-[1.5em]","children":["\n",["$","li",null,{"className":"x:my-[.5em]","children":["$","code",null,{"className":"nextra-code","dir":"ltr","children":"@PreDestroy"}]}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":["$","code",null,{"className":"nextra-code","dir":"ltr","children":"DisposableBean.destroy()"}]}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":[["$","code",null,{"className":"nextra-code","dir":"ltr","children":"@Bean"}],"의 ",["$","code",null,{"className":"nextra-code","dir":"ltr","children":"destroyMethod"}]]}],"\n"]}]
+41:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"이 단계에서 주로 하는 일:"}]
+42:["$","ul",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-disc x:ms-[1.5em]","children":["\n",["$","li",null,{"className":"x:my-[.5em]","children":"DB 커넥션 풀 정리"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"외부 소켓/네트워크 자원 해제"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"쓰레드풀 shutdown"}],"\n"]}]
+43:["$","hr",null,{"className":"x:my-[2em] nextra-border"}]
+44:["$","h2",null,{"id":"6-전체-bean-lifecycle-요약","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-10 x:border-b x:pb-1 x:text-3xl nextra-border","children":["6. 전체 Bean Lifecycle 요약",["$","$L9",null,{"id":"6-전체-bean-lifecycle-요약"}]]}]
+45:["$","div",null,{"className":"flex justify-start","children":["$","div",null,{"className":"inline-block text-center","children":["$","div",null,{"data-pagefind-ignore":"all","className":"nextra-code x:relative x:not-first:mt-[1.25em]","children":["$undefined",["$","pre",null,{"className":"x:group x:focus-visible:nextra-focus x:overflow-x-auto x:subpixel-antialiased x:text-[.9em] x:bg-white x:dark:bg-black x:py-4 x:ring-1 x:ring-inset x:ring-gray-300 x:dark:ring-neutral-700 x:contrast-more:ring-gray-900 x:contrast-more:dark:ring-gray-50 x:contrast-more:contrast-150 x:rounded-md not-prose","tabIndex":"0","children":[["$","div",null,{"className":"x:group-hover:opacity-100 x:group-focus:opacity-100 x:opacity-0 x:transition x:focus-within:opacity-100 x:flex x:gap-1 x:absolute x:right-4 x:top-2","children":[["$","$La",null,{"children":["$","svg",null,{"viewBox":"0 0 24 24","fill":"currentColor","height":"1em","children":["$","path",null,{"d":"M4 19h6v-2H4v2zM20 5H4v2h16V5zm-3 6H4v2h13.25c1.1 0 2 .9 2 2s-.9 2-2 2H15v-2l-3 3l3 3v-2h2c2.21 0 4-1.79 4-4s-1.79-4-4-4z"}]}]}],false]}],["$","code",null,{"className":"nextra-code","dir":"ltr","children":[["$","span",null,{"children":["$","span",null,{"children":"1. BeanDefinition 로딩"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"2. Bean 인스턴스 생성 (생성자)"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"3. 의존성 주입 (DI)"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"4. Aware 콜백"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"5. BeanPostProcessor(before)"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"6. 초기화 콜백 (@PostConstruct, afterPropertiesSet, initMethod)"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"7. BeanPostProcessor(after)"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"→ 애플리케이션에서 Bean 사용"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"8. 컨텍스트 종료 시 소멸 콜백 (@PreDestroy, destroy, destroyMethod)"}]}]]}]]}]]}]}]}]
+46:["$","hr",null,{"className":"x:my-[2em] nextra-border"}]
+47:["$","h2",null,{"id":"7-실무-기준-핵심-정리","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-10 x:border-b x:pb-1 x:text-3xl nextra-border","children":["7. 실무 기준 핵심 정리",["$","$L9",null,{"id":"7-실무-기준-핵심-정리"}]]}]
+48:["$","ul",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-disc x:ms-[1.5em]","children":["\n",["$","li",null,{"className":"x:my-[.5em]","children":["비즈니스 Bean에서는 ",["$","strong",null,{"children":[["$","code",null,{"className":"nextra-code","dir":"ltr","children":"@PostConstruct"}]," / ",["$","code",null,{"className":"nextra-code","dir":"ltr","children":"@PreDestroy"}]]}]," 를 우선 사용한다."]}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":["외부 리소스(소켓, 커넥션, 스레드풀)를 다루는 Bean은 ",["$","strong",null,{"children":"소멸 콜백을 반드시 구현"}],"해야 한다."]}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":["라이프사이클 전체를 이해하면, AOP/트랜잭션/리소스 관리가 ",["$","strong",null,{"children":"어디에 얹혀 동작하는지"}]," 한눈에 보인다."]}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"BeanPostProcessor는 내부적으로 매우 많이 쓰이지만, 직접 구현할 일은 드물다."}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"“생성 → 주입 → 초기화 → 사용 → 소멸” 흐름만 명확하게 머릿속에 그려지면, 나머지는 구현 디테일이다."}],"\n"]}]
+4b:null
+4c:["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"    }"}]}]
+4d:["$","span",null,{"children":" "}]
+4e:["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"    @"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"PreDestroy"}]]}]
+4f:["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"    public"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":" void"}],["$","span",null,{"style":{"--shiki-light":"#6F42C1","--shiki-dark":"#B392F0"},"children":" shutdown"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"() {"}]]}]
+50:["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#6A737D","--shiki-dark":"#6A737D"},"children":"        // 종료 전에 연결 정리 등"}]}]
+51:["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"        cacheClient."}],["$","span",null,{"style":{"--shiki-light":"#6F42C1","--shiki-dark":"#B392F0"},"children":"close"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"();"}]]}]
+52:["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"    }"}]}]
+53:["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"}"}]}]
+54:["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":") {"}]
+55:["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#6A737D","--shiki-dark":"#6A737D"},"children":"        // 초기화 후에 프록시 감싸기 등"}]}]
+56:["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"        return"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":" bean;"}]]}]
+57:["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"    }"}]}]
+58:["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"}"}]}]

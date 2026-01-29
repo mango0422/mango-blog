@@ -1,0 +1,267 @@
+1:"$Sreact.fragment"
+2:I[36382,["/mango-blog/_next/static/chunks/508d891aa0792da0.js","/mango-blog/_next/static/chunks/c35a7285345f739e.js","/mango-blog/_next/static/chunks/cea628e83a0a07c2.js","/mango-blog/_next/static/chunks/311bfda68bef2673.js","/mango-blog/_next/static/chunks/8fba60bd4135542a.js","/mango-blog/_next/static/chunks/caa4d2b3cb50cf17.js","/mango-blog/_next/static/chunks/b39b1f344c22c3eb.js","/mango-blog/_next/static/chunks/e1a9aaa3e8d4ba89.js","/mango-blog/_next/static/chunks/36d54e21a0527d75.js","/mango-blog/_next/static/chunks/6beefafa8f4f3a9a.js","/mango-blog/_next/static/chunks/b417336136017bb8.js"],"TOCProvider"]
+3:I[18476,["/mango-blog/_next/static/chunks/508d891aa0792da0.js","/mango-blog/_next/static/chunks/c35a7285345f739e.js","/mango-blog/_next/static/chunks/cea628e83a0a07c2.js","/mango-blog/_next/static/chunks/311bfda68bef2673.js","/mango-blog/_next/static/chunks/8fba60bd4135542a.js","/mango-blog/_next/static/chunks/caa4d2b3cb50cf17.js","/mango-blog/_next/static/chunks/b39b1f344c22c3eb.js","/mango-blog/_next/static/chunks/e1a9aaa3e8d4ba89.js","/mango-blog/_next/static/chunks/36d54e21a0527d75.js","/mango-blog/_next/static/chunks/6beefafa8f4f3a9a.js","/mango-blog/_next/static/chunks/b417336136017bb8.js"],"Sidebar"]
+4:I[83985,["/mango-blog/_next/static/chunks/508d891aa0792da0.js","/mango-blog/_next/static/chunks/c35a7285345f739e.js","/mango-blog/_next/static/chunks/cea628e83a0a07c2.js","/mango-blog/_next/static/chunks/311bfda68bef2673.js","/mango-blog/_next/static/chunks/8fba60bd4135542a.js","/mango-blog/_next/static/chunks/caa4d2b3cb50cf17.js","/mango-blog/_next/static/chunks/b39b1f344c22c3eb.js","/mango-blog/_next/static/chunks/e1a9aaa3e8d4ba89.js","/mango-blog/_next/static/chunks/36d54e21a0527d75.js","/mango-blog/_next/static/chunks/6beefafa8f4f3a9a.js","/mango-blog/_next/static/chunks/b417336136017bb8.js"],"ClientWrapper"]
+9:I[9288,["/mango-blog/_next/static/chunks/508d891aa0792da0.js","/mango-blog/_next/static/chunks/c35a7285345f739e.js","/mango-blog/_next/static/chunks/cea628e83a0a07c2.js","/mango-blog/_next/static/chunks/311bfda68bef2673.js","/mango-blog/_next/static/chunks/8fba60bd4135542a.js","/mango-blog/_next/static/chunks/caa4d2b3cb50cf17.js","/mango-blog/_next/static/chunks/b39b1f344c22c3eb.js","/mango-blog/_next/static/chunks/e1a9aaa3e8d4ba89.js","/mango-blog/_next/static/chunks/36d54e21a0527d75.js","/mango-blog/_next/static/chunks/6beefafa8f4f3a9a.js","/mango-blog/_next/static/chunks/b417336136017bb8.js"],"HeadingAnchor"]
+30:I[45297,["/mango-blog/_next/static/chunks/7ceea1baff856d5d.js","/mango-blog/_next/static/chunks/e1fc490196dff2be.js"],"OutletBoundary"]
+31:"$Sreact.suspense"
+33:I[34542,["/mango-blog/_next/static/chunks/508d891aa0792da0.js","/mango-blog/_next/static/chunks/c35a7285345f739e.js","/mango-blog/_next/static/chunks/cea628e83a0a07c2.js","/mango-blog/_next/static/chunks/311bfda68bef2673.js","/mango-blog/_next/static/chunks/8fba60bd4135542a.js","/mango-blog/_next/static/chunks/caa4d2b3cb50cf17.js","/mango-blog/_next/static/chunks/b39b1f344c22c3eb.js","/mango-blog/_next/static/chunks/e1a9aaa3e8d4ba89.js","/mango-blog/_next/static/chunks/36d54e21a0527d75.js","/mango-blog/_next/static/chunks/6beefafa8f4f3a9a.js","/mango-blog/_next/static/chunks/b417336136017bb8.js"],"ToggleWordWrapButton"]
+5:T13e5,---
+title: IoC / DI 핵심 개념 정리
+description: 스프링 IoC 컨테이너, Bean, DI 구조 전반 정리
+date: 2025-11-25
+tags:
+  - spring
+  - ioc
+  - di
+  - container
+---
+
+# IoC / DI 핵심 개념
+
+스프링의 가장 중요한 기반 기술은 **IoC(Inversion of Control)** 과 **DI(Dependency Injection)** 이다.
+애플리케이션의 객체 생성·초기화·연결을 개발자가 아닌 **스프링 컨테이너가 관리**한다는 데 의미가 있다.
+
+---
+
+## 1. IoC(Inversion of Control)
+
+IoC는 말 그대로 **제어의 역전**이다.  
+원래 객체 생성과 의존성 연결은 *개발자 코드가 직접 수행*하는 것이 일반적이지만,  
+스프링에서는 이 제어 흐름을 모두 **컨테이너에게 위임**한다.
+
+IoC의 핵심은 다음 두 구조로 구현된다.
+
+- **BeanFactory** (가장 기본적인 IoC 컨테이너)
+- **ApplicationContext** (BeanFactory 기능 + 다양한 부가 기능)
+
+애플리케이션 구동 시, 스프링은 BeanDefinition을 읽고 Bean을 생성하여 컨테이너에 등록한 뒤 관리한다.
+
+---
+
+## 2. BeanFactory vs ApplicationContext
+
+스프링 컨테이너는 크게 아래 두 종류로 나뉜다.
+
+### BeanFactory
+
+- 스프링 IoC의 최소 기능 제공
+- 지연 초기화(Lazy init) 중심
+- 거의 직접 사용할 일이 없다
+
+### ApplicationContext
+
+- 실무와 스프링부트에서 사용하는 핵심 컨테이너
+- BeanFactory 확장판
+- 메시지 소스, 이벤트 발행, AOP, 환경 정보 등 다양한 기능 포함
+
+스프링 부트에서는 환경(web/non-web)에 따라
+`ApplicationContext`의 여러 구현체(예: `AnnotationConfigServletWebServerApplicationContext`)를 사용하지만,
+개발자는 보통 이를 단순히 `ApplicationContext`로 취급하면 된다.
+
+---
+
+## 3. DI(Dependency Injection)
+
+DI는 객체 간 의존성을 생성자나 메서드를 통해 주입하는 패턴이다.
+
+스프링에서는 아래 3가지 스타일을 지원한다.
+
+- **생성자 주입(권장)**
+- **필드 주입(비권장)**
+- **Setter 주입(옵션 의존성에 활용)**
+
+---
+
+## 4. DI 방식별 비교
+
+### 4.1 생성자 주입 (가장 권장)
+
+<CodeLayout>
+
+```java
+@Service
+public class OrderService {
+    private final UserRepository userRepository;
+
+    public OrderService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+}
+```
+
+</CodeLayout>
+
+장점:
+
+- 불변(immutability) 보장
+- 테스트 용이
+- 의존성 누락을 컴파일 타임에 방지
+- Lombok `@RequiredArgsConstructor` 와 궁합이 좋음
+
+### 4.2 필드 주입 (권장 X)
+
+<CodeLayout>
+
+```java
+@Service
+public class OrderService {
+    @Autowired
+    private UserRepository userRepository;
+}
+```
+
+</CodeLayout>
+
+단점:
+
+- DI 프레임워크 없이는 테스트 불가능
+- 의존성이 숨겨져 구조 파악 어려움
+- 순환 참조 문제를 더 쉽게 유발
+
+### 4.3 Setter 주입 (옵션 의존성에 적합)
+
+<CodeLayout>
+
+```java
+@Service
+public class OrderService {
+    private UserRepository userRepository;
+
+    @Autowired
+    public void setUserRepository(UserRepository repository) {
+        this.userRepository = repository;
+    }
+}
+```
+
+</CodeLayout>
+
+장점:
+
+- 런타임 조건에 따라 의존성 갈아끼우기 가능
+- 선택적/optional 한 의존성에 맞음
+
+---
+
+## 5. @ComponentScan — 자동 Bean 등록
+
+스프링은 classpath 상의 특정 패키지를 스캔하여 자동으로 Bean을 등록한다.
+
+<CodeLayout>
+
+```java
+@SpringBootApplication
+public class App {
+    public static void main(String[] args) {
+        SpringApplication.run(App.class, args);
+    }
+}
+```
+
+</CodeLayout>
+
+`@SpringBootApplication` 은 내부적으로 다음을 포함한다.
+
+- `@ComponentScan` → 자동 스캔
+- `@Configuration` → 설정 파일
+- `@EnableAutoConfiguration`
+
+스캔 대상 애노테이션:
+
+- `@Component`
+- `@Service`
+- `@Repository`
+- `@Controller`
+- `@RestController`
+
+---
+
+## 6. @Bean — 수동 Bean 등록
+
+자동 스캔이 아닌, 개발자가 명시적으로 Bean을 등록하는 방식.
+
+<CodeLayout>
+
+```java
+@Configuration
+public class AppConfig {
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+}
+```
+
+</CodeLayout>
+
+위와 같이 등록하면 빈 이름은 기본적으로 **메서드명**이 된다.
+
+---
+
+## 7. 컴포넌트 스캔 흐름 정리
+
+<CodeLayout>
+```
+1. @ComponentScan 선언
+2. 지정된 패키지를 classpath scanning
+3. @Component 계열 애노테이션이 붙은 클래스 탐색
+4. BeanDefinition 생성
+5. ApplicationContext 초기화 시점에 Bean 생성
+```
+
+</CodeLayout>
+
+---
+
+## 8. 실무 기준 핵심 정리
+
+- DI는 **생성자 주입이 기본 원칙**이다.
+- ApplicationContext가 IoC 컨테이너의 표준 구현이다.
+- 컴포넌트 스캔 + 수동 Bean(@Bean) 조합으로 유연한 구조를 설계한다.
+- 필드 주입은 테스트 어려움과 구조 불명확성 때문에 피해야 한다.
+- IoC/DI는 스프링 전체 생태계의 기반이며, 이후 AOP, 트랜잭션 등도 모두 이 위에서 동작한다.0:{"buildId":"uaExnbQ2pT_-jQkaFTBLZ","rsc":["$","$1","c",{"children":[["$","div",null,{"className":"x:mx-auto x:flex x:max-w-(--nextra-content-width)","children":["$","$L2",null,{"value":[{"value":"1. IoC(Inversion of Control)","id":"1-iocinversion-of-control","depth":2},{"value":"2. BeanFactory vs ApplicationContext","id":"2-beanfactory-vs-applicationcontext","depth":2},{"value":"BeanFactory","id":"beanfactory","depth":3},{"value":"ApplicationContext","id":"applicationcontext","depth":3},{"value":"3. DI(Dependency Injection)","id":"3-didependency-injection","depth":2},{"value":"4. DI 방식별 비교","id":"4-di-방식별-비교","depth":2},{"value":"4.1 생성자 주입 (가장 권장)","id":"41-생성자-주입-가장-권장","depth":3},{"value":"4.2 필드 주입 (권장 X)","id":"42-필드-주입-권장-x","depth":3},{"value":"4.3 Setter 주입 (옵션 의존성에 적합)","id":"43-setter-주입-옵션-의존성에-적합","depth":3},{"value":"5. @ComponentScan — 자동 Bean 등록","id":"5-componentscan--자동-bean-등록","depth":2},{"value":"6. @Bean — 수동 Bean 등록","id":"6-bean--수동-bean-등록","depth":2},{"value":"7. 컴포넌트 스캔 흐름 정리","id":"7-컴포넌트-스캔-흐름-정리","depth":2},{"value":"8. 실무 기준 핵심 정리","id":"8-실무-기준-핵심-정리","depth":2}],"children":[["$","$L3",null,{}],["$","$L4",null,{"metadata":{"title":"IoC / DI 핵심 개념 정리","description":"스프링 IoC 컨테이너, Bean, DI 구조 전반 정리","date":"2025-11-25","tags":["spring","ioc","di","container"],"filePath":"src/content/springboot/01-spring-core/2-ioc-di-basics.mdx","timestamp":1764081894000},"sourceCode":"$5","children":["$L6","$L7"]}]]}]}],null,"$L8"]}],"loading":null,"isPartial":false}
+6:["$","div",null,{"id":"nextra-skip-nav"}]
+7:["$","main",null,{"data-pagefind-body":true,"children":[["$","h1",null,{"className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-bold x:mt-2 x:text-4xl","children":["IoC / DI 핵심 개념","$undefined"]}],"\n",["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":["스프링의 가장 중요한 기반 기술은 ",["$","strong",null,{"children":"IoC(Inversion of Control)"}]," 과 ",["$","strong",null,{"children":"DI(Dependency Injection)"}]," 이다.\n애플리케이션의 객체 생성·초기화·연결을 개발자가 아닌 ",["$","strong",null,{"children":"스프링 컨테이너가 관리"}],"한다는 데 의미가 있다."]}],"\n",["$","hr",null,{"className":"x:my-[2em] nextra-border"}],"\n",["$","h2",null,{"id":"1-iocinversion-of-control","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-10 x:border-b x:pb-1 x:text-3xl nextra-border","children":["1. IoC(Inversion of Control)",["$","$L9",null,{"id":"1-iocinversion-of-control"}]]}],"\n",["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":["IoC는 말 그대로 ",["$","strong",null,{"children":"제어의 역전"}],"이다.",["$","br",null,{}],"\n","원래 객체 생성과 의존성 연결은 ",["$","em",null,{"children":"개발자 코드가 직접 수행"}],"하는 것이 일반적이지만,",["$","br",null,{}],"\n","스프링에서는 이 제어 흐름을 모두 ",["$","strong",null,{"children":"컨테이너에게 위임"}],"한다."]}],"\n",["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"IoC의 핵심은 다음 두 구조로 구현된다."}],"\n",["$","ul",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-disc x:ms-[1.5em]","children":["\n",["$","li",null,{"className":"x:my-[.5em]","children":[["$","strong",null,{"children":"BeanFactory"}]," (가장 기본적인 IoC 컨테이너)"]}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":[["$","strong",null,{"children":"ApplicationContext"}]," (BeanFactory 기능 + 다양한 부가 기능)"]}],"\n"]}],"\n",["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"애플리케이션 구동 시, 스프링은 BeanDefinition을 읽고 Bean을 생성하여 컨테이너에 등록한 뒤 관리한다."}],"\n",["$","hr",null,{"className":"x:my-[2em] nextra-border"}],"\n",["$","h2",null,{"id":"2-beanfactory-vs-applicationcontext","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-10 x:border-b x:pb-1 x:text-3xl nextra-border","children":["2. BeanFactory vs ApplicationContext",["$","$L9",null,{"id":"2-beanfactory-vs-applicationcontext"}]]}],"\n",["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"스프링 컨테이너는 크게 아래 두 종류로 나뉜다."}],"\n",["$","h3",null,{"id":"beanfactory","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-8 x:text-2xl","children":["BeanFactory",["$","$L9",null,{"id":"beanfactory"}]]}],"\n",["$","ul",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-disc x:ms-[1.5em]","children":["\n",["$","li",null,{"className":"x:my-[.5em]","children":"스프링 IoC의 최소 기능 제공"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"지연 초기화(Lazy init) 중심"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"거의 직접 사용할 일이 없다"}],"\n"]}],"\n",["$","h3",null,{"id":"applicationcontext","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-8 x:text-2xl","children":["ApplicationContext",["$","$L9",null,{"id":"applicationcontext"}]]}],"\n",["$","ul",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-disc x:ms-[1.5em]","children":["\n",["$","li",null,{"className":"x:my-[.5em]","children":"실무와 스프링부트에서 사용하는 핵심 컨테이너"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"BeanFactory 확장판"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"메시지 소스, 이벤트 발행, AOP, 환경 정보 등 다양한 기능 포함"}],"\n"]}],"\n",["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":["스프링 부트에서는 환경(web/non-web)에 따라\n",["$","code",null,{"className":"nextra-code","dir":"ltr","children":"ApplicationContext"}],"의 여러 구현체(예: ",["$","code",null,{"className":"nextra-code","dir":"ltr","children":"AnnotationConfigServletWebServerApplicationContext"}],")를 사용하지만,\n개발자는 보통 이를 단순히 ",["$","code",null,{"className":"nextra-code","dir":"ltr","children":"ApplicationContext"}],"로 취급하면 된다."]}],"\n","$La","\n","$Lb","\n","$Lc","\n","$Ld","\n","$Le","\n","$Lf","\n","$L10","\n","$L11","\n","$L12","\n","$L13","\n","$L14","\n","$L15","\n","$L16","\n","$L17","\n","$L18","\n","$L19","\n","$L1a","\n","$L1b","\n","$L1c","\n","$L1d","\n","$L1e","\n","$L1f","\n","$L20","\n","$L21","\n","$L22","\n","$L23","\n","$L24","\n","$L25","\n","$L26","\n","$L27","\n","$L28","\n","$L29","\n","$L2a","\n","$L2b","\n","$L2c","\n","$L2d","\n","$L2e","\n","$L2f"]}]
+8:["$","$L30",null,{"children":["$","$31",null,{"name":"Next.MetadataOutlet","children":"$@32"}]}]
+a:["$","hr",null,{"className":"x:my-[2em] nextra-border"}]
+b:["$","h2",null,{"id":"3-didependency-injection","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-10 x:border-b x:pb-1 x:text-3xl nextra-border","children":["3. DI(Dependency Injection)",["$","$L9",null,{"id":"3-didependency-injection"}]]}]
+c:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"DI는 객체 간 의존성을 생성자나 메서드를 통해 주입하는 패턴이다."}]
+d:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"스프링에서는 아래 3가지 스타일을 지원한다."}]
+e:["$","ul",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-disc x:ms-[1.5em]","children":["\n",["$","li",null,{"className":"x:my-[.5em]","children":["$","strong",null,{"children":"생성자 주입(권장)"}]}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":["$","strong",null,{"children":"필드 주입(비권장)"}]}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":["$","strong",null,{"children":"Setter 주입(옵션 의존성에 활용)"}]}],"\n"]}]
+f:["$","hr",null,{"className":"x:my-[2em] nextra-border"}]
+10:["$","h2",null,{"id":"4-di-방식별-비교","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-10 x:border-b x:pb-1 x:text-3xl nextra-border","children":["4. DI 방식별 비교",["$","$L9",null,{"id":"4-di-방식별-비교"}]]}]
+11:["$","h3",null,{"id":"41-생성자-주입-가장-권장","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-8 x:text-2xl","children":["4.1 생성자 주입 (가장 권장)",["$","$L9",null,{"id":"41-생성자-주입-가장-권장"}]]}]
+12:["$","div",null,{"className":"flex justify-start","children":["$","div",null,{"className":"inline-block text-left","children":["$","div",null,{"data-pagefind-ignore":"all","className":"nextra-code x:relative x:not-first:mt-[1.25em]","children":["$undefined",["$","pre",null,{"className":"x:group x:focus-visible:nextra-focus x:overflow-x-auto x:subpixel-antialiased x:text-[.9em] x:bg-white x:dark:bg-black x:py-4 x:ring-1 x:ring-inset x:ring-gray-300 x:dark:ring-neutral-700 x:contrast-more:ring-gray-900 x:contrast-more:dark:ring-gray-50 x:contrast-more:contrast-150 x:rounded-md not-prose","tabIndex":"0","children":[["$","div",null,{"className":"x:group-hover:opacity-100 x:group-focus:opacity-100 x:opacity-0 x:transition x:focus-within:opacity-100 x:flex x:gap-1 x:absolute x:right-4 x:top-2","children":[["$","$L33",null,{"children":["$","svg",null,{"viewBox":"0 0 24 24","fill":"currentColor","height":"1em","children":["$","path",null,{"d":"M4 19h6v-2H4v2zM20 5H4v2h16V5zm-3 6H4v2h13.25c1.1 0 2 .9 2 2s-.9 2-2 2H15v-2l-3 3l3 3v-2h2c2.21 0 4-1.79 4-4s-1.79-4-4-4z"}]}]}],false]}],["$","code",null,{"className":"nextra-code","dir":"ltr","children":[["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"@"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"Service"}]]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"public"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":" class"}],["$","span",null,{"style":{"--shiki-light":"#6F42C1","--shiki-dark":"#B392F0"},"children":" OrderService"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":" {"}]]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"    private"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":" final"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":" UserRepository userRepository;"}]]}],"\n",["$","span",null,{"children":" "}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"    public"}],["$","span",null,{"style":{"--shiki-light":"#6F42C1","--shiki-dark":"#B392F0"},"children":" OrderService"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"(UserRepository "}],["$","span",null,{"style":{"--shiki-light":"#E36209","--shiki-dark":"#FFAB70"},"children":"userRepository"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":") {"}]]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#005CC5","--shiki-dark":"#79B8FF"},"children":"        this"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":".userRepository "}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"="}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":" userRepository;"}]]}],"\n",["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"    }"}]}],"\n",["$","span",null,{"children":" "}],"\n",["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"}"}]}]]}]]}]]}]}]}]
+13:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"장점:"}]
+14:["$","ul",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-disc x:ms-[1.5em]","children":["\n",["$","li",null,{"className":"x:my-[.5em]","children":"불변(immutability) 보장"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"테스트 용이"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"의존성 누락을 컴파일 타임에 방지"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":["Lombok ",["$","code",null,{"className":"nextra-code","dir":"ltr","children":"@RequiredArgsConstructor"}]," 와 궁합이 좋음"]}],"\n"]}]
+15:["$","h3",null,{"id":"42-필드-주입-권장-x","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-8 x:text-2xl","children":["4.2 필드 주입 (권장 X)",["$","$L9",null,{"id":"42-필드-주입-권장-x"}]]}]
+16:["$","div",null,{"className":"flex justify-start","children":["$","div",null,{"className":"inline-block text-left","children":["$","div",null,{"data-pagefind-ignore":"all","className":"nextra-code x:relative x:not-first:mt-[1.25em]","children":["$undefined",["$","pre",null,{"className":"x:group x:focus-visible:nextra-focus x:overflow-x-auto x:subpixel-antialiased x:text-[.9em] x:bg-white x:dark:bg-black x:py-4 x:ring-1 x:ring-inset x:ring-gray-300 x:dark:ring-neutral-700 x:contrast-more:ring-gray-900 x:contrast-more:dark:ring-gray-50 x:contrast-more:contrast-150 x:rounded-md not-prose","tabIndex":"0","children":[["$","div",null,{"className":"x:group-hover:opacity-100 x:group-focus:opacity-100 x:opacity-0 x:transition x:focus-within:opacity-100 x:flex x:gap-1 x:absolute x:right-4 x:top-2","children":[["$","$L33",null,{"children":["$","svg",null,{"viewBox":"0 0 24 24","fill":"currentColor","height":"1em","children":["$","path",null,{"d":"M4 19h6v-2H4v2zM20 5H4v2h16V5zm-3 6H4v2h13.25c1.1 0 2 .9 2 2s-.9 2-2 2H15v-2l-3 3l3 3v-2h2c2.21 0 4-1.79 4-4s-1.79-4-4-4z"}]}]}],false]}],["$","code",null,{"className":"nextra-code","dir":"ltr","children":[["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"@"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"Service"}]]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"public"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":" class"}],["$","span",null,{"style":{"--shiki-light":"#6F42C1","--shiki-dark":"#B392F0"},"children":" OrderService"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":" {"}]]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"    @"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"Autowired"}]]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"    private"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":" UserRepository userRepository;"}]]}],"\n",["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"}"}]}]]}]]}]]}]}]}]
+17:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"단점:"}]
+18:["$","ul",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-disc x:ms-[1.5em]","children":["\n",["$","li",null,{"className":"x:my-[.5em]","children":"DI 프레임워크 없이는 테스트 불가능"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"의존성이 숨겨져 구조 파악 어려움"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"순환 참조 문제를 더 쉽게 유발"}],"\n"]}]
+19:["$","h3",null,{"id":"43-setter-주입-옵션-의존성에-적합","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-8 x:text-2xl","children":["4.3 Setter 주입 (옵션 의존성에 적합)",["$","$L9",null,{"id":"43-setter-주입-옵션-의존성에-적합"}]]}]
+1a:["$","div",null,{"className":"flex justify-start","children":["$","div",null,{"className":"inline-block text-left","children":["$","div",null,{"data-pagefind-ignore":"all","className":"nextra-code x:relative x:not-first:mt-[1.25em]","children":["$undefined",["$","pre",null,{"className":"x:group x:focus-visible:nextra-focus x:overflow-x-auto x:subpixel-antialiased x:text-[.9em] x:bg-white x:dark:bg-black x:py-4 x:ring-1 x:ring-inset x:ring-gray-300 x:dark:ring-neutral-700 x:contrast-more:ring-gray-900 x:contrast-more:dark:ring-gray-50 x:contrast-more:contrast-150 x:rounded-md not-prose","tabIndex":"0","children":[["$","div",null,{"className":"x:group-hover:opacity-100 x:group-focus:opacity-100 x:opacity-0 x:transition x:focus-within:opacity-100 x:flex x:gap-1 x:absolute x:right-4 x:top-2","children":[["$","$L33",null,{"children":["$","svg",null,{"viewBox":"0 0 24 24","fill":"currentColor","height":"1em","children":["$","path",null,{"d":"M4 19h6v-2H4v2zM20 5H4v2h16V5zm-3 6H4v2h13.25c1.1 0 2 .9 2 2s-.9 2-2 2H15v-2l-3 3l3 3v-2h2c2.21 0 4-1.79 4-4s-1.79-4-4-4z"}]}]}],false]}],["$","code",null,{"className":"nextra-code","dir":"ltr","children":[["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"@"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"Service"}]]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"public"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":" class"}],["$","span",null,{"style":{"--shiki-light":"#6F42C1","--shiki-dark":"#B392F0"},"children":" OrderService"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":" {"}]]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"    private"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":" UserRepository userRepository;"}]]}],"\n",["$","span",null,{"children":" "}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"    @"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"Autowired"}]]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"    public"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":" void"}],["$","span",null,{"style":{"--shiki-light":"#6F42C1","--shiki-dark":"#B392F0"},"children":" setUserRepository"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"(UserRepository "}],["$","span",null,{"style":{"--shiki-light":"#E36209","--shiki-dark":"#FFAB70"},"children":"repository"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":") {"}]]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#005CC5","--shiki-dark":"#79B8FF"},"children":"        this"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":".userRepository "}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"="}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":" repository;"}]]}],"\n",["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"    }"}]}],"\n",["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"}"}]}]]}]]}]]}]}]}]
+1b:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"장점:"}]
+1c:["$","ul",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-disc x:ms-[1.5em]","children":["\n",["$","li",null,{"className":"x:my-[.5em]","children":"런타임 조건에 따라 의존성 갈아끼우기 가능"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"선택적/optional 한 의존성에 맞음"}],"\n"]}]
+1d:["$","hr",null,{"className":"x:my-[2em] nextra-border"}]
+1e:["$","h2",null,{"id":"5-componentscan--자동-bean-등록","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-10 x:border-b x:pb-1 x:text-3xl nextra-border","children":["5. @ComponentScan — 자동 Bean 등록",["$","$L9",null,{"id":"5-componentscan--자동-bean-등록"}]]}]
+1f:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"스프링은 classpath 상의 특정 패키지를 스캔하여 자동으로 Bean을 등록한다."}]
+20:["$","div",null,{"className":"flex justify-start","children":["$","div",null,{"className":"inline-block text-left","children":["$","div",null,{"data-pagefind-ignore":"all","className":"nextra-code x:relative x:not-first:mt-[1.25em]","children":["$undefined",["$","pre",null,{"className":"x:group x:focus-visible:nextra-focus x:overflow-x-auto x:subpixel-antialiased x:text-[.9em] x:bg-white x:dark:bg-black x:py-4 x:ring-1 x:ring-inset x:ring-gray-300 x:dark:ring-neutral-700 x:contrast-more:ring-gray-900 x:contrast-more:dark:ring-gray-50 x:contrast-more:contrast-150 x:rounded-md not-prose","tabIndex":"0","children":[["$","div",null,{"className":"x:group-hover:opacity-100 x:group-focus:opacity-100 x:opacity-0 x:transition x:focus-within:opacity-100 x:flex x:gap-1 x:absolute x:right-4 x:top-2","children":[["$","$L33",null,{"children":["$","svg",null,{"viewBox":"0 0 24 24","fill":"currentColor","height":"1em","children":["$","path",null,{"d":"M4 19h6v-2H4v2zM20 5H4v2h16V5zm-3 6H4v2h13.25c1.1 0 2 .9 2 2s-.9 2-2 2H15v-2l-3 3l3 3v-2h2c2.21 0 4-1.79 4-4s-1.79-4-4-4z"}]}]}],false]}],["$","code",null,{"className":"nextra-code","dir":"ltr","children":[["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"@"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"SpringBootApplication"}]]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"public"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":" class"}],["$","span",null,{"style":{"--shiki-light":"#6F42C1","--shiki-dark":"#B392F0"},"children":" App"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":" {"}]]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"    public"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":" static"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":" void"}],["$","span",null,{"style":{"--shiki-light":"#6F42C1","--shiki-dark":"#B392F0"},"children":" main"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"("}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"String"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"[] "}],["$","span",null,{"style":{"--shiki-light":"#E36209","--shiki-dark":"#FFAB70"},"children":"args"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":") {"}]]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"        SpringApplication."}],["$","span",null,{"style":{"--shiki-light":"#6F42C1","--shiki-dark":"#B392F0"},"children":"run"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"(App.class, args);"}]]}],"\n",["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"    }"}]}],"\n",["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"}"}]}]]}]]}]]}]}]}]
+21:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":[["$","code",null,{"className":"nextra-code","dir":"ltr","children":"@SpringBootApplication"}]," 은 내부적으로 다음을 포함한다."]}]
+22:["$","ul",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-disc x:ms-[1.5em]","children":["\n",["$","li",null,{"className":"x:my-[.5em]","children":[["$","code",null,{"className":"nextra-code","dir":"ltr","children":"@ComponentScan"}]," → 자동 스캔"]}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":[["$","code",null,{"className":"nextra-code","dir":"ltr","children":"@Configuration"}]," → 설정 파일"]}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":["$","code",null,{"className":"nextra-code","dir":"ltr","children":"@EnableAutoConfiguration"}]}],"\n"]}]
+23:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"스캔 대상 애노테이션:"}]
+24:["$","ul",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-disc x:ms-[1.5em]","children":["\n",["$","li",null,{"className":"x:my-[.5em]","children":["$","code",null,{"className":"nextra-code","dir":"ltr","children":"@Component"}]}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":["$","code",null,{"className":"nextra-code","dir":"ltr","children":"@Service"}]}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":["$","code",null,{"className":"nextra-code","dir":"ltr","children":"@Repository"}]}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":["$","code",null,{"className":"nextra-code","dir":"ltr","children":"@Controller"}]}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":["$","code",null,{"className":"nextra-code","dir":"ltr","children":"@RestController"}]}],"\n"]}]
+25:["$","hr",null,{"className":"x:my-[2em] nextra-border"}]
+26:["$","h2",null,{"id":"6-bean--수동-bean-등록","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-10 x:border-b x:pb-1 x:text-3xl nextra-border","children":["6. @Bean — 수동 Bean 등록",["$","$L9",null,{"id":"6-bean--수동-bean-등록"}]]}]
+27:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"자동 스캔이 아닌, 개발자가 명시적으로 Bean을 등록하는 방식."}]
+28:["$","div",null,{"className":"flex justify-start","children":["$","div",null,{"className":"inline-block text-left","children":["$","div",null,{"data-pagefind-ignore":"all","className":"nextra-code x:relative x:not-first:mt-[1.25em]","children":["$undefined",["$","pre",null,{"className":"x:group x:focus-visible:nextra-focus x:overflow-x-auto x:subpixel-antialiased x:text-[.9em] x:bg-white x:dark:bg-black x:py-4 x:ring-1 x:ring-inset x:ring-gray-300 x:dark:ring-neutral-700 x:contrast-more:ring-gray-900 x:contrast-more:dark:ring-gray-50 x:contrast-more:contrast-150 x:rounded-md not-prose","tabIndex":"0","children":[["$","div",null,{"className":"x:group-hover:opacity-100 x:group-focus:opacity-100 x:opacity-0 x:transition x:focus-within:opacity-100 x:flex x:gap-1 x:absolute x:right-4 x:top-2","children":[["$","$L33",null,{"children":["$","svg",null,{"viewBox":"0 0 24 24","fill":"currentColor","height":"1em","children":["$","path",null,{"d":"M4 19h6v-2H4v2zM20 5H4v2h16V5zm-3 6H4v2h13.25c1.1 0 2 .9 2 2s-.9 2-2 2H15v-2l-3 3l3 3v-2h2c2.21 0 4-1.79 4-4s-1.79-4-4-4z"}]}]}],false]}],["$","code",null,{"className":"nextra-code","dir":"ltr","children":[["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"@"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"Configuration"}]]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"public"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":" class"}],["$","span",null,{"style":{"--shiki-light":"#6F42C1","--shiki-dark":"#B392F0"},"children":" AppConfig"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":" {"}]]}],"\n",["$","span",null,{"children":" "}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"    @"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"Bean"}]]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"    public"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":" PasswordEncoder "}],["$","span",null,{"style":{"--shiki-light":"#6F42C1","--shiki-dark":"#B392F0"},"children":"passwordEncoder"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"() {"}]]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"        return"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":" new"}],["$","span",null,{"style":{"--shiki-light":"#6F42C1","--shiki-dark":"#B392F0"},"children":" BCryptPasswordEncoder"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"();"}]]}],"\n",["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"    }"}]}],"\n",["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"}"}]}]]}]]}]]}]}]}]
+29:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":["위와 같이 등록하면 빈 이름은 기본적으로 ",["$","strong",null,{"children":"메서드명"}],"이 된다."]}]
+2a:["$","hr",null,{"className":"x:my-[2em] nextra-border"}]
+2b:["$","h2",null,{"id":"7-컴포넌트-스캔-흐름-정리","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-10 x:border-b x:pb-1 x:text-3xl nextra-border","children":["7. 컴포넌트 스캔 흐름 정리",["$","$L9",null,{"id":"7-컴포넌트-스캔-흐름-정리"}]]}]
+2c:["$","div",null,{"className":"flex justify-start","children":["$","div",null,{"className":"inline-block text-left","children":["$","div",null,{"data-pagefind-ignore":"all","className":"nextra-code x:relative x:not-first:mt-[1.25em]","children":["$undefined",["$","pre",null,{"className":"x:group x:focus-visible:nextra-focus x:overflow-x-auto x:subpixel-antialiased x:text-[.9em] x:bg-white x:dark:bg-black x:py-4 x:ring-1 x:ring-inset x:ring-gray-300 x:dark:ring-neutral-700 x:contrast-more:ring-gray-900 x:contrast-more:dark:ring-gray-50 x:contrast-more:contrast-150 x:rounded-md not-prose","tabIndex":"0","children":[["$","div",null,{"className":"x:group-hover:opacity-100 x:group-focus:opacity-100 x:opacity-0 x:transition x:focus-within:opacity-100 x:flex x:gap-1 x:absolute x:right-4 x:top-2","children":[["$","$L33",null,{"children":["$","svg",null,{"viewBox":"0 0 24 24","fill":"currentColor","height":"1em","children":["$","path",null,{"d":"M4 19h6v-2H4v2zM20 5H4v2h16V5zm-3 6H4v2h13.25c1.1 0 2 .9 2 2s-.9 2-2 2H15v-2l-3 3l3 3v-2h2c2.21 0 4-1.79 4-4s-1.79-4-4-4z"}]}]}],false]}],["$","code",null,{"className":"nextra-code","dir":"ltr","children":[["$","span",null,{"children":["$","span",null,{"children":"1. @ComponentScan 선언"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"2. 지정된 패키지를 classpath scanning"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"3. @Component 계열 애노테이션이 붙은 클래스 탐색"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"4. BeanDefinition 생성"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"5. ApplicationContext 초기화 시점에 Bean 생성"}]}]]}]]}]]}]}]}]
+2d:["$","hr",null,{"className":"x:my-[2em] nextra-border"}]
+2e:["$","h2",null,{"id":"8-실무-기준-핵심-정리","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-10 x:border-b x:pb-1 x:text-3xl nextra-border","children":["8. 실무 기준 핵심 정리",["$","$L9",null,{"id":"8-실무-기준-핵심-정리"}]]}]
+2f:["$","ul",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-disc x:ms-[1.5em]","children":["\n",["$","li",null,{"className":"x:my-[.5em]","children":["DI는 ",["$","strong",null,{"children":"생성자 주입이 기본 원칙"}],"이다."]}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"ApplicationContext가 IoC 컨테이너의 표준 구현이다."}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"컴포넌트 스캔 + 수동 Bean(@Bean) 조합으로 유연한 구조를 설계한다."}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"필드 주입은 테스트 어려움과 구조 불명확성 때문에 피해야 한다."}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"IoC/DI는 스프링 전체 생태계의 기반이며, 이후 AOP, 트랜잭션 등도 모두 이 위에서 동작한다."}],"\n"]}]
+32:null

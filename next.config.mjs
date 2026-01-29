@@ -1,6 +1,8 @@
 // next.config.mjs
 import nextra from "nextra";
 
+const isGhPages = process.env.GITHUB_PAGES === '1'
+
 const withNextra = nextra({
   search: { codeblocks: false },
 });
@@ -18,6 +20,7 @@ const nextConfig = {
       "next-mdx-import-source-file": "./src/mdx-components.tsx",
     },
   },
+  basePath: isGhPages ? '/mango-blog' : '',
 };
 
 export default withNextra(nextConfig);

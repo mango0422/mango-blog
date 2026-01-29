@@ -1,0 +1,312 @@
+1:"$Sreact.fragment"
+2:I[36382,["/mango-blog/_next/static/chunks/508d891aa0792da0.js","/mango-blog/_next/static/chunks/c35a7285345f739e.js","/mango-blog/_next/static/chunks/cea628e83a0a07c2.js","/mango-blog/_next/static/chunks/311bfda68bef2673.js","/mango-blog/_next/static/chunks/8fba60bd4135542a.js","/mango-blog/_next/static/chunks/caa4d2b3cb50cf17.js","/mango-blog/_next/static/chunks/b39b1f344c22c3eb.js","/mango-blog/_next/static/chunks/e1a9aaa3e8d4ba89.js","/mango-blog/_next/static/chunks/36d54e21a0527d75.js","/mango-blog/_next/static/chunks/6beefafa8f4f3a9a.js","/mango-blog/_next/static/chunks/b417336136017bb8.js"],"TOCProvider"]
+3:I[18476,["/mango-blog/_next/static/chunks/508d891aa0792da0.js","/mango-blog/_next/static/chunks/c35a7285345f739e.js","/mango-blog/_next/static/chunks/cea628e83a0a07c2.js","/mango-blog/_next/static/chunks/311bfda68bef2673.js","/mango-blog/_next/static/chunks/8fba60bd4135542a.js","/mango-blog/_next/static/chunks/caa4d2b3cb50cf17.js","/mango-blog/_next/static/chunks/b39b1f344c22c3eb.js","/mango-blog/_next/static/chunks/e1a9aaa3e8d4ba89.js","/mango-blog/_next/static/chunks/36d54e21a0527d75.js","/mango-blog/_next/static/chunks/6beefafa8f4f3a9a.js","/mango-blog/_next/static/chunks/b417336136017bb8.js"],"Sidebar"]
+4:I[83985,["/mango-blog/_next/static/chunks/508d891aa0792da0.js","/mango-blog/_next/static/chunks/c35a7285345f739e.js","/mango-blog/_next/static/chunks/cea628e83a0a07c2.js","/mango-blog/_next/static/chunks/311bfda68bef2673.js","/mango-blog/_next/static/chunks/8fba60bd4135542a.js","/mango-blog/_next/static/chunks/caa4d2b3cb50cf17.js","/mango-blog/_next/static/chunks/b39b1f344c22c3eb.js","/mango-blog/_next/static/chunks/e1a9aaa3e8d4ba89.js","/mango-blog/_next/static/chunks/36d54e21a0527d75.js","/mango-blog/_next/static/chunks/6beefafa8f4f3a9a.js","/mango-blog/_next/static/chunks/b417336136017bb8.js"],"ClientWrapper"]
+9:I[9288,["/mango-blog/_next/static/chunks/508d891aa0792da0.js","/mango-blog/_next/static/chunks/c35a7285345f739e.js","/mango-blog/_next/static/chunks/cea628e83a0a07c2.js","/mango-blog/_next/static/chunks/311bfda68bef2673.js","/mango-blog/_next/static/chunks/8fba60bd4135542a.js","/mango-blog/_next/static/chunks/caa4d2b3cb50cf17.js","/mango-blog/_next/static/chunks/b39b1f344c22c3eb.js","/mango-blog/_next/static/chunks/e1a9aaa3e8d4ba89.js","/mango-blog/_next/static/chunks/36d54e21a0527d75.js","/mango-blog/_next/static/chunks/6beefafa8f4f3a9a.js","/mango-blog/_next/static/chunks/b417336136017bb8.js"],"HeadingAnchor"]
+a:I[34542,["/mango-blog/_next/static/chunks/508d891aa0792da0.js","/mango-blog/_next/static/chunks/c35a7285345f739e.js","/mango-blog/_next/static/chunks/cea628e83a0a07c2.js","/mango-blog/_next/static/chunks/311bfda68bef2673.js","/mango-blog/_next/static/chunks/8fba60bd4135542a.js","/mango-blog/_next/static/chunks/caa4d2b3cb50cf17.js","/mango-blog/_next/static/chunks/b39b1f344c22c3eb.js","/mango-blog/_next/static/chunks/e1a9aaa3e8d4ba89.js","/mango-blog/_next/static/chunks/36d54e21a0527d75.js","/mango-blog/_next/static/chunks/6beefafa8f4f3a9a.js","/mango-blog/_next/static/chunks/b417336136017bb8.js"],"ToggleWordWrapButton"]
+46:I[45297,["/mango-blog/_next/static/chunks/7ceea1baff856d5d.js","/mango-blog/_next/static/chunks/e1fc490196dff2be.js"],"OutletBoundary"]
+47:"$Sreact.suspense"
+5:T163d,---
+title: Spring MVC 전체 흐름
+description: DispatcherServlet 중심의 요청 처리 단계별 구조 정리
+date: 2025-11-25
+tags:
+  - spring
+  - mvc
+  - web
+---
+
+# Spring MVC 전체 흐름
+
+Spring MVC는 **요청(Request)** 이 들어온 순간부터  
+**응답(Response)** 이 반환될 때까지명확한 파이프라인으로 동작한다.  
+이 문서는 DispatcherServlet을 중심으로 전체 흐름을 단계별로 정리한다.
+
+---
+
+## 1. 전체 아키텍처 개요
+
+Spring MVC는 크게 아래 구성 요소가 협력하며 작동한다.
+
+- **DispatcherServlet** (프론트 컨트롤러)
+- **HandlerMapping**
+- **HandlerAdapter**
+- **Controller** (핸들러)
+- **ArgumentResolver** / **ReturnValueHandler**
+- **ViewResolver** (또는 JSON 변환기)
+- **Filter / Interceptor**
+
+전체 요청 흐름은 아래와 같다.
+
+<CodeLayout inner="center">
+
+```
+HTTP Request
+   ↓
+[Filter Chain]
+   ↓
+DispatcherServlet
+   ↓
+HandlerMapping → HandlerAdapter
+   ↓
+Controller (핸들러 실행)
+   ↓
+ReturnValueHandler
+   ↓
+ViewResolver / HttpMessageConverter
+   ↓
+HTTP Response
+```
+
+</CodeLayout>
+
+---
+
+## 2. Filter → Interceptor → Controller 실행 순서
+
+### 2.1 Filter (서블릿 레벨)
+
+- WAS(Tomcat)가 Servlet 실행 전에 호출
+- 인증/인가, 로깅, CORS 등에 사용
+- Spring 외부 기술 (Jakarta Servlet)
+
+### 2.2 Interceptor (스프링 레벨)
+
+- Spring MVC 내부에서 동작
+- `preHandle`, `postHandle`, `afterCompletion` 제공
+- 인증 체크, 공통 로깅, locale 처리 등에 사용
+
+### 실행 순서
+
+<CodeLayout>
+
+```
+Filter → Interceptor(pre) → Controller → Interceptor(post) → Interceptor(after) → Filter
+```
+
+</CodeLayout>
+
+---
+
+## 3. DispatcherServlet 요청 처리 단계
+
+DispatcherServlet은 Spring MVC의 **프론트 컨트롤러**로,  
+모든 요청을 단일 진입점에서 처리한다.
+
+### Step 1. 요청 수신
+
+- 애플리케이션에서 Spring MVC로 처리하도록 매핑된 요청은 모두 DispatcherServlet으로 들어온다.
+
+### Step 2. HandlerMapping 탐색
+
+- 요청 URL과 매핑된 **Controller 메서드**를 찾는다.
+- 대표적인 구현체:
+
+  - `RequestMappingHandlerMapping` → `@RequestMapping` 기반
+
+### Step 3. HandlerAdapter 선택
+
+- 해당 핸들러(Controller)를 실행할 수 있는 Adapter 선택
+- `RequestMappingHandlerAdapter`가 대표적
+
+### Step 4. 핸들러(Controller) 실행
+
+- 컨트롤러 메서드 호출
+- 이 과정에서 **ArgumentResolver**가 파라미터를 주입한다.
+
+예: `@RequestParam`, `@PathVariable`, `@RequestBody`, `HttpServletRequest`, DTO
+
+### Step 5. 반환값 처리
+
+- **ReturnValueHandler**가 Controller 결과를 분석해 후처리
+- @ResponseBody이면 → HttpMessageConverter 사용(JSON 직렬화)
+- ModelAndView이면 → ViewResolver 수행
+
+### Step 6. ViewResolver / HttpMessageConverter
+
+- API 서버의 경우 99%는 **JSON 변환기**가 사용됨
+- 템플릿 엔진 Thymeleaf의 경우 ViewResolver가 렌더링
+
+### Step 7. 최종 Response 반환
+
+- JSON, HTML, 파일 등으로 변환되어 클라이언트에 응답됨
+
+---
+
+## 4. ArgumentResolver
+
+스프링이 컨트롤러 메서드에 "알아서 파라미터를 넣어주는" 핵심 기술.
+
+예시:
+
+<CodeLayout>
+```java
+@GetMapping("/hello/{id}")
+public UserDto hello(@PathVariable Long id,
+                     @RequestParam String name,
+                     HttpServletRequest req,
+                     @RequestBody CreateDto body) {...}
+```
+</CodeLayout>
+
+이 모든 파라미터는 ArgumentResolver가 자동 변환하여 주입한다.
+
+주요 ArgumentResolver:
+
+- `PathVariableMethodArgumentResolver`
+- `RequestParamMethodArgumentResolver`
+- `RequestResponseBodyMethodProcessor` (JSON → 객체)
+
+---
+
+## 5. ReturnValueHandler
+
+Controller가 반환한 값을 "어떻게 응답으로 만들지" 결정한다.
+
+예:
+
+- `String` 반환 → View 이름으로 처리
+- `ModelAndView` → 명시적 View
+- `@ResponseBody` → JSON 직렬화
+
+스프링 부트 웹 API에서
+
+<CodeLayout>
+```java
+@GetMapping("/api/user")
+public UserResponse getUser() {
+    return new UserResponse("mango", 20);
+}
+```
+</CodeLayout>
+
+→ 자동으로 JSON으로 변환됨
+
+---
+
+## 6. HttpMessageConverter (JSON 직렬화)
+
+API 서버의 핵심 구성 요소.
+
+- JSON ↔ Java 객체 변환 담당
+- 기본 구현: `MappingJackson2HttpMessageConverter`
+- `@ResponseBody` 또는 `@RestController`에서 자동 적용
+
+동작 순서:
+
+1. 객체 반환
+2. HttpMessageConverter가 JSON으로 변환
+3. Content-Type: application/json 설정
+4. 응답 출력
+
+---
+
+## 7. ViewResolver (템플릿 엔진 사용 시)
+
+Thymeleaf, JSP 등을 사용할 때만 작동.
+REST API 구성에서는 보통 사용하지 않음.
+
+역할:
+
+- 컨트롤러가 반환한 view 이름을 기반으로 실제 템플릿을 찾는다.
+
+예: `return "home";` → `templates/home.html`
+
+---
+
+## 8. Spring MVC 전체 요청 흐름 요약
+
+<CodeLayout inner="center">
+
+```
+클라이언트 요청
+  ↓
+Filter → Interceptor → DispatcherServlet
+  ↓
+HandlerMapping → HandlerAdapter
+  ↓
+Controller 실행
+  ↓
+ArgumentResolver로 파라미터 주입
+  ↓
+ReturnValueHandler로 반환값 처리
+  ↓
+HttpMessageConverter(JSON) / ViewResolver
+  ↓
+응답 반환
+```
+
+</CodeLayout>
+
+---
+
+## 9. 실무 기준 핵심 정리
+
+- DispatcherServlet은 **모든 요청의 단일 관문**이다.
+- ArgumentResolver/ReturnValueHandler가 MVC의 **유연성과 확장성의 핵심**이다.
+- API 서버에서는 **ViewResolver 대신 HttpMessageConverter**가 중심.
+- Filter는 Servlet, Interceptor는 Spring MVC 시스템 레벨.
+- 컨트롤러 작성만 해도 복잡한 내부 구조가 자동으로 처리된다.0:{"buildId":"uaExnbQ2pT_-jQkaFTBLZ","rsc":["$","$1","c",{"children":[["$","div",null,{"className":"x:mx-auto x:flex x:max-w-(--nextra-content-width)","children":["$","$L2",null,{"value":[{"value":"1. 전체 아키텍처 개요","id":"1-전체-아키텍처-개요","depth":2},{"value":"2. Filter → Interceptor → Controller 실행 순서","id":"2-filter--interceptor--controller-실행-순서","depth":2},{"value":"2.1 Filter (서블릿 레벨)","id":"21-filter-서블릿-레벨","depth":3},{"value":"2.2 Interceptor (스프링 레벨)","id":"22-interceptor-스프링-레벨","depth":3},{"value":"실행 순서","id":"실행-순서","depth":3},{"value":"3. DispatcherServlet 요청 처리 단계","id":"3-dispatcherservlet-요청-처리-단계","depth":2},{"value":"Step 1. 요청 수신","id":"step-1-요청-수신","depth":3},{"value":"Step 2. HandlerMapping 탐색","id":"step-2-handlermapping-탐색","depth":3},{"value":"Step 3. HandlerAdapter 선택","id":"step-3-handleradapter-선택","depth":3},{"value":"Step 4. 핸들러(Controller) 실행","id":"step-4-핸들러controller-실행","depth":3},{"value":"Step 5. 반환값 처리","id":"step-5-반환값-처리","depth":3},{"value":"Step 6. ViewResolver / HttpMessageConverter","id":"step-6-viewresolver--httpmessageconverter","depth":3},{"value":"Step 7. 최종 Response 반환","id":"step-7-최종-response-반환","depth":3},{"value":"4. ArgumentResolver","id":"4-argumentresolver","depth":2},{"value":"5. ReturnValueHandler","id":"5-returnvaluehandler","depth":2},{"value":"6. HttpMessageConverter (JSON 직렬화)","id":"6-httpmessageconverter-json-직렬화","depth":2},{"value":"7. ViewResolver (템플릿 엔진 사용 시)","id":"7-viewresolver-템플릿-엔진-사용-시","depth":2},{"value":"8. Spring MVC 전체 요청 흐름 요약","id":"8-spring-mvc-전체-요청-흐름-요약","depth":2},{"value":"9. 실무 기준 핵심 정리","id":"9-실무-기준-핵심-정리","depth":2}],"children":[["$","$L3",null,{}],["$","$L4",null,{"metadata":{"title":"Spring MVC 전체 흐름","description":"DispatcherServlet 중심의 요청 처리 단계별 구조 정리","date":"2025-11-25","tags":["spring","mvc","web"],"filePath":"src/content/springboot/01-spring-core/1-spring-mvc-flow.mdx"},"sourceCode":"$5","children":["$L6","$L7"]}]]}]}],null,"$L8"]}],"loading":null,"isPartial":false}
+6:["$","div",null,{"id":"nextra-skip-nav"}]
+7:["$","main",null,{"data-pagefind-body":true,"children":[["$","h1",null,{"className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-bold x:mt-2 x:text-4xl","children":["Spring MVC 전체 흐름","$undefined"]}],"\n",["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":["Spring MVC는 ",["$","strong",null,{"children":"요청(Request)"}]," 이 들어온 순간부터",["$","br",null,{}],"\n",["$","strong",null,{"children":"응답(Response)"}]," 이 반환될 때까지명확한 파이프라인으로 동작한다.",["$","br",null,{}],"\n","이 문서는 DispatcherServlet을 중심으로 전체 흐름을 단계별로 정리한다."]}],"\n",["$","hr",null,{"className":"x:my-[2em] nextra-border"}],"\n",["$","h2",null,{"id":"1-전체-아키텍처-개요","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-10 x:border-b x:pb-1 x:text-3xl nextra-border","children":["1. 전체 아키텍처 개요",["$","$L9",null,{"id":"1-전체-아키텍처-개요"}]]}],"\n",["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"Spring MVC는 크게 아래 구성 요소가 협력하며 작동한다."}],"\n",["$","ul",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-disc x:ms-[1.5em]","children":["\n",["$","li",null,{"className":"x:my-[.5em]","children":[["$","strong",null,{"children":"DispatcherServlet"}]," (프론트 컨트롤러)"]}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":["$","strong",null,{"children":"HandlerMapping"}]}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":["$","strong",null,{"children":"HandlerAdapter"}]}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":[["$","strong",null,{"children":"Controller"}]," (핸들러)"]}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":[["$","strong",null,{"children":"ArgumentResolver"}]," / ",["$","strong",null,{"children":"ReturnValueHandler"}]]}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":[["$","strong",null,{"children":"ViewResolver"}]," (또는 JSON 변환기)"]}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":["$","strong",null,{"children":"Filter / Interceptor"}]}],"\n"]}],"\n",["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"전체 요청 흐름은 아래와 같다."}],"\n",["$","div",null,{"className":"flex justify-start","children":["$","div",null,{"className":"inline-block text-center","children":["$","div",null,{"data-pagefind-ignore":"all","className":"nextra-code x:relative x:not-first:mt-[1.25em]","children":["$undefined",["$","pre",null,{"className":"x:group x:focus-visible:nextra-focus x:overflow-x-auto x:subpixel-antialiased x:text-[.9em] x:bg-white x:dark:bg-black x:py-4 x:ring-1 x:ring-inset x:ring-gray-300 x:dark:ring-neutral-700 x:contrast-more:ring-gray-900 x:contrast-more:dark:ring-gray-50 x:contrast-more:contrast-150 x:rounded-md not-prose","tabIndex":"0","children":[["$","div",null,{"className":"x:group-hover:opacity-100 x:group-focus:opacity-100 x:opacity-0 x:transition x:focus-within:opacity-100 x:flex x:gap-1 x:absolute x:right-4 x:top-2","children":[["$","$La",null,{"children":["$","svg",null,{"viewBox":"0 0 24 24","fill":"currentColor","height":"1em","children":["$","path",null,{"d":"M4 19h6v-2H4v2zM20 5H4v2h16V5zm-3 6H4v2h13.25c1.1 0 2 .9 2 2s-.9 2-2 2H15v-2l-3 3l3 3v-2h2c2.21 0 4-1.79 4-4s-1.79-4-4-4z"}]}]}],false]}],["$","code",null,{"className":"nextra-code","dir":"ltr","children":[["$","span",null,{"children":["$","span",null,{"children":"HTTP Request"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"   ↓"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"[Filter Chain]"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"   ↓"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"DispatcherServlet"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"   ↓"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"HandlerMapping → HandlerAdapter"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"   ↓"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"Controller (핸들러 실행)"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"   ↓"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"ReturnValueHandler"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"   ↓"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"ViewResolver / HttpMessageConverter"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"   ↓"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"HTTP Response"}]}]]}]]}]]}]}]}],"\n",["$","hr",null,{"className":"x:my-[2em] nextra-border"}],"\n","$Lb","\n","$Lc","\n","$Ld","\n","$Le","\n","$Lf","\n","$L10","\n","$L11","\n","$L12","\n","$L13","\n","$L14","\n","$L15","\n","$L16","\n","$L17","\n","$L18","\n","$L19","\n","$L1a","\n","$L1b","\n","$L1c","\n","$L1d","\n","$L1e","\n","$L1f","\n","$L20","\n","$L21","\n","$L22","\n","$L23","\n","$L24","\n","$L25","\n","$L26","\n","$L27","\n","$L28","\n","$L29","\n","$L2a","\n","$L2b","\n","$L2c","\n","$L2d","\n","$L2e","\n","$L2f","\n","$L30","\n","$L31","\n","$L32","\n","$L33","\n","$L34","\n","$L35","\n","$L36","\n","$L37","\n","$L38","\n","$L39","\n","$L3a","\n","$L3b","\n","$L3c","\n","$L3d","\n","$L3e","\n","$L3f","\n","$L40","\n","$L41","\n","$L42","\n","$L43","\n","$L44","\n","$L45"]}]
+8:["$","$L46",null,{"children":["$","$47",null,{"name":"Next.MetadataOutlet","children":"$@48"}]}]
+b:["$","h2",null,{"id":"2-filter--interceptor--controller-실행-순서","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-10 x:border-b x:pb-1 x:text-3xl nextra-border","children":["2. Filter → Interceptor → Controller 실행 순서",["$","$L9",null,{"id":"2-filter--interceptor--controller-실행-순서"}]]}]
+c:["$","h3",null,{"id":"21-filter-서블릿-레벨","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-8 x:text-2xl","children":["2.1 Filter (서블릿 레벨)",["$","$L9",null,{"id":"21-filter-서블릿-레벨"}]]}]
+d:["$","ul",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-disc x:ms-[1.5em]","children":["\n",["$","li",null,{"className":"x:my-[.5em]","children":"WAS(Tomcat)가 Servlet 실행 전에 호출"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"인증/인가, 로깅, CORS 등에 사용"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"Spring 외부 기술 (Jakarta Servlet)"}],"\n"]}]
+e:["$","h3",null,{"id":"22-interceptor-스프링-레벨","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-8 x:text-2xl","children":["2.2 Interceptor (스프링 레벨)",["$","$L9",null,{"id":"22-interceptor-스프링-레벨"}]]}]
+f:["$","ul",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-disc x:ms-[1.5em]","children":["\n",["$","li",null,{"className":"x:my-[.5em]","children":"Spring MVC 내부에서 동작"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":[["$","code",null,{"className":"nextra-code","dir":"ltr","children":"preHandle"}],", ",["$","code",null,{"className":"nextra-code","dir":"ltr","children":"postHandle"}],", ",["$","code",null,{"className":"nextra-code","dir":"ltr","children":"afterCompletion"}]," 제공"]}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"인증 체크, 공통 로깅, locale 처리 등에 사용"}],"\n"]}]
+10:["$","h3",null,{"id":"실행-순서","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-8 x:text-2xl","children":["실행 순서",["$","$L9",null,{"id":"실행-순서"}]]}]
+11:["$","div",null,{"className":"flex justify-start","children":["$","div",null,{"className":"inline-block text-left","children":["$","div",null,{"data-pagefind-ignore":"all","className":"nextra-code x:relative x:not-first:mt-[1.25em]","children":["$undefined",["$","pre",null,{"className":"x:group x:focus-visible:nextra-focus x:overflow-x-auto x:subpixel-antialiased x:text-[.9em] x:bg-white x:dark:bg-black x:py-4 x:ring-1 x:ring-inset x:ring-gray-300 x:dark:ring-neutral-700 x:contrast-more:ring-gray-900 x:contrast-more:dark:ring-gray-50 x:contrast-more:contrast-150 x:rounded-md not-prose","tabIndex":"0","children":[["$","div",null,{"className":"x:group-hover:opacity-100 x:group-focus:opacity-100 x:opacity-0 x:transition x:focus-within:opacity-100 x:flex x:gap-1 x:absolute x:right-4 x:top-2","children":[["$","$La",null,{"children":["$","svg",null,{"viewBox":"0 0 24 24","fill":"currentColor","height":"1em","children":["$","path",null,{"d":"M4 19h6v-2H4v2zM20 5H4v2h16V5zm-3 6H4v2h13.25c1.1 0 2 .9 2 2s-.9 2-2 2H15v-2l-3 3l3 3v-2h2c2.21 0 4-1.79 4-4s-1.79-4-4-4z"}]}]}],false]}],["$","code",null,{"className":"nextra-code","dir":"ltr","children":["$","span",null,{"children":["$","span",null,{"children":"Filter → Interceptor(pre) → Controller → Interceptor(post) → Interceptor(after) → Filter"}]}]}]]}]]}]}]}]
+12:["$","hr",null,{"className":"x:my-[2em] nextra-border"}]
+13:["$","h2",null,{"id":"3-dispatcherservlet-요청-처리-단계","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-10 x:border-b x:pb-1 x:text-3xl nextra-border","children":["3. DispatcherServlet 요청 처리 단계",["$","$L9",null,{"id":"3-dispatcherservlet-요청-처리-단계"}]]}]
+14:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":["DispatcherServlet은 Spring MVC의 ",["$","strong",null,{"children":"프론트 컨트롤러"}],"로,",["$","br",null,{}],"\n","모든 요청을 단일 진입점에서 처리한다."]}]
+15:["$","h3",null,{"id":"step-1-요청-수신","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-8 x:text-2xl","children":["Step 1. 요청 수신",["$","$L9",null,{"id":"step-1-요청-수신"}]]}]
+16:["$","ul",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-disc x:ms-[1.5em]","children":["\n",["$","li",null,{"className":"x:my-[.5em]","children":"애플리케이션에서 Spring MVC로 처리하도록 매핑된 요청은 모두 DispatcherServlet으로 들어온다."}],"\n"]}]
+17:["$","h3",null,{"id":"step-2-handlermapping-탐색","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-8 x:text-2xl","children":["Step 2. HandlerMapping 탐색",["$","$L9",null,{"id":"step-2-handlermapping-탐색"}]]}]
+18:["$","ul",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-disc x:ms-[1.5em]","children":["\n",["$","li",null,{"className":"x:my-[.5em]","children":["\n",["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":["요청 URL과 매핑된 ",["$","strong",null,{"children":"Controller 메서드"}],"를 찾는다."]}],"\n"]}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":["\n",["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"대표적인 구현체:"}],"\n",["$","ul",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-disc x:ms-[1.5em]","children":["\n",["$","li",null,{"className":"x:my-[.5em]","children":[["$","code",null,{"className":"nextra-code","dir":"ltr","children":"RequestMappingHandlerMapping"}]," → ",["$","code",null,{"className":"nextra-code","dir":"ltr","children":"@RequestMapping"}]," 기반"]}],"\n"]}],"\n"]}],"\n"]}]
+19:["$","h3",null,{"id":"step-3-handleradapter-선택","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-8 x:text-2xl","children":["Step 3. HandlerAdapter 선택",["$","$L9",null,{"id":"step-3-handleradapter-선택"}]]}]
+1a:["$","ul",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-disc x:ms-[1.5em]","children":["\n",["$","li",null,{"className":"x:my-[.5em]","children":"해당 핸들러(Controller)를 실행할 수 있는 Adapter 선택"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":[["$","code",null,{"className":"nextra-code","dir":"ltr","children":"RequestMappingHandlerAdapter"}],"가 대표적"]}],"\n"]}]
+1b:["$","h3",null,{"id":"step-4-핸들러controller-실행","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-8 x:text-2xl","children":["Step 4. 핸들러(Controller) 실행",["$","$L9",null,{"id":"step-4-핸들러controller-실행"}]]}]
+1c:["$","ul",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-disc x:ms-[1.5em]","children":["\n",["$","li",null,{"className":"x:my-[.5em]","children":"컨트롤러 메서드 호출"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":["이 과정에서 ",["$","strong",null,{"children":"ArgumentResolver"}],"가 파라미터를 주입한다."]}],"\n"]}]
+1d:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":["예: ",["$","code",null,{"className":"nextra-code","dir":"ltr","children":"@RequestParam"}],", ",["$","code",null,{"className":"nextra-code","dir":"ltr","children":"@PathVariable"}],", ",["$","code",null,{"className":"nextra-code","dir":"ltr","children":"@RequestBody"}],", ",["$","code",null,{"className":"nextra-code","dir":"ltr","children":"HttpServletRequest"}],", DTO"]}]
+1e:["$","h3",null,{"id":"step-5-반환값-처리","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-8 x:text-2xl","children":["Step 5. 반환값 처리",["$","$L9",null,{"id":"step-5-반환값-처리"}]]}]
+1f:["$","ul",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-disc x:ms-[1.5em]","children":["\n",["$","li",null,{"className":"x:my-[.5em]","children":[["$","strong",null,{"children":"ReturnValueHandler"}],"가 Controller 결과를 분석해 후처리"]}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"@ResponseBody이면 → HttpMessageConverter 사용(JSON 직렬화)"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"ModelAndView이면 → ViewResolver 수행"}],"\n"]}]
+20:["$","h3",null,{"id":"step-6-viewresolver--httpmessageconverter","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-8 x:text-2xl","children":["Step 6. ViewResolver / HttpMessageConverter",["$","$L9",null,{"id":"step-6-viewresolver--httpmessageconverter"}]]}]
+21:["$","ul",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-disc x:ms-[1.5em]","children":["\n",["$","li",null,{"className":"x:my-[.5em]","children":["API 서버의 경우 99%는 ",["$","strong",null,{"children":"JSON 변환기"}],"가 사용됨"]}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"템플릿 엔진 Thymeleaf의 경우 ViewResolver가 렌더링"}],"\n"]}]
+22:["$","h3",null,{"id":"step-7-최종-response-반환","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-8 x:text-2xl","children":["Step 7. 최종 Response 반환",["$","$L9",null,{"id":"step-7-최종-response-반환"}]]}]
+23:["$","ul",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-disc x:ms-[1.5em]","children":["\n",["$","li",null,{"className":"x:my-[.5em]","children":"JSON, HTML, 파일 등으로 변환되어 클라이언트에 응답됨"}],"\n"]}]
+24:["$","hr",null,{"className":"x:my-[2em] nextra-border"}]
+25:["$","h2",null,{"id":"4-argumentresolver","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-10 x:border-b x:pb-1 x:text-3xl nextra-border","children":["4. ArgumentResolver",["$","$L9",null,{"id":"4-argumentresolver"}]]}]
+26:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"스프링이 컨트롤러 메서드에 “알아서 파라미터를 넣어주는” 핵심 기술."}]
+27:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"예시:"}]
+28:["$","div",null,{"className":"flex justify-start","children":["$","div",null,{"className":"inline-block text-left","children":["$","div",null,{"data-pagefind-ignore":"all","className":"nextra-code x:relative x:not-first:mt-[1.25em]","children":["$undefined",["$","pre",null,{"className":"x:group x:focus-visible:nextra-focus x:overflow-x-auto x:subpixel-antialiased x:text-[.9em] x:bg-white x:dark:bg-black x:py-4 x:ring-1 x:ring-inset x:ring-gray-300 x:dark:ring-neutral-700 x:contrast-more:ring-gray-900 x:contrast-more:dark:ring-gray-50 x:contrast-more:contrast-150 x:rounded-md not-prose","tabIndex":"0","children":[["$","div",null,{"className":"x:group-hover:opacity-100 x:group-focus:opacity-100 x:opacity-0 x:transition x:focus-within:opacity-100 x:flex x:gap-1 x:absolute x:right-4 x:top-2","children":[["$","$La",null,{"children":["$","svg",null,{"viewBox":"0 0 24 24","fill":"currentColor","height":"1em","children":["$","path",null,{"d":"M4 19h6v-2H4v2zM20 5H4v2h16V5zm-3 6H4v2h13.25c1.1 0 2 .9 2 2s-.9 2-2 2H15v-2l-3 3l3 3v-2h2c2.21 0 4-1.79 4-4s-1.79-4-4-4z"}]}]}],false]}],["$","code",null,{"className":"nextra-code","dir":"ltr","children":[["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"@"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"GetMapping"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"("}],["$","span",null,{"style":{"--shiki-light":"#032F62","--shiki-dark":"#9ECBFF"},"children":"\"/hello/{id}\""}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":")"}]]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"public"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":" UserDto "}],["$","span",null,{"style":{"--shiki-light":"#6F42C1","--shiki-dark":"#B392F0"},"children":"hello"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"(@"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"PathVariable"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":" Long id,"}]]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"                     @"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"RequestParam"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":" String name,"}]]}],"\n",["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"                     HttpServletRequest req,"}]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"                     @"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"RequestBody"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":" CreateDto body) {...}"}]]}]]}]]}]]}]}]}]
+29:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"이 모든 파라미터는 ArgumentResolver가 자동 변환하여 주입한다."}]
+2a:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"주요 ArgumentResolver:"}]
+2b:["$","ul",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-disc x:ms-[1.5em]","children":["\n",["$","li",null,{"className":"x:my-[.5em]","children":["$","code",null,{"className":"nextra-code","dir":"ltr","children":"PathVariableMethodArgumentResolver"}]}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":["$","code",null,{"className":"nextra-code","dir":"ltr","children":"RequestParamMethodArgumentResolver"}]}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":[["$","code",null,{"className":"nextra-code","dir":"ltr","children":"RequestResponseBodyMethodProcessor"}]," (JSON → 객체)"]}],"\n"]}]
+2c:["$","hr",null,{"className":"x:my-[2em] nextra-border"}]
+2d:["$","h2",null,{"id":"5-returnvaluehandler","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-10 x:border-b x:pb-1 x:text-3xl nextra-border","children":["5. ReturnValueHandler",["$","$L9",null,{"id":"5-returnvaluehandler"}]]}]
+2e:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"Controller가 반환한 값을 “어떻게 응답으로 만들지” 결정한다."}]
+2f:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"예:"}]
+30:["$","ul",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-disc x:ms-[1.5em]","children":["\n",["$","li",null,{"className":"x:my-[.5em]","children":[["$","code",null,{"className":"nextra-code","dir":"ltr","children":"String"}]," 반환 → View 이름으로 처리"]}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":[["$","code",null,{"className":"nextra-code","dir":"ltr","children":"ModelAndView"}]," → 명시적 View"]}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":[["$","code",null,{"className":"nextra-code","dir":"ltr","children":"@ResponseBody"}]," → JSON 직렬화"]}],"\n"]}]
+31:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"스프링 부트 웹 API에서"}]
+32:["$","div",null,{"className":"flex justify-start","children":["$","div",null,{"className":"inline-block text-left","children":["$","div",null,{"data-pagefind-ignore":"all","className":"nextra-code x:relative x:not-first:mt-[1.25em]","children":["$undefined",["$","pre",null,{"className":"x:group x:focus-visible:nextra-focus x:overflow-x-auto x:subpixel-antialiased x:text-[.9em] x:bg-white x:dark:bg-black x:py-4 x:ring-1 x:ring-inset x:ring-gray-300 x:dark:ring-neutral-700 x:contrast-more:ring-gray-900 x:contrast-more:dark:ring-gray-50 x:contrast-more:contrast-150 x:rounded-md not-prose","tabIndex":"0","children":[["$","div",null,{"className":"x:group-hover:opacity-100 x:group-focus:opacity-100 x:opacity-0 x:transition x:focus-within:opacity-100 x:flex x:gap-1 x:absolute x:right-4 x:top-2","children":[["$","$La",null,{"children":["$","svg",null,{"viewBox":"0 0 24 24","fill":"currentColor","height":"1em","children":["$","path",null,{"d":"M4 19h6v-2H4v2zM20 5H4v2h16V5zm-3 6H4v2h13.25c1.1 0 2 .9 2 2s-.9 2-2 2H15v-2l-3 3l3 3v-2h2c2.21 0 4-1.79 4-4s-1.79-4-4-4z"}]}]}],false]}],["$","code",null,{"className":"nextra-code","dir":"ltr","children":[["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"@"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"GetMapping"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"("}],["$","span",null,{"style":{"--shiki-light":"#032F62","--shiki-dark":"#9ECBFF"},"children":"\"/api/user\""}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":")"}]]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"public"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":" UserResponse "}],["$","span",null,{"style":{"--shiki-light":"#6F42C1","--shiki-dark":"#B392F0"},"children":"getUser"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"() {"}]]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"    return"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":" new"}],["$","span",null,{"style":{"--shiki-light":"#6F42C1","--shiki-dark":"#B392F0"},"children":" UserResponse"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"("}],["$","span",null,{"style":{"--shiki-light":"#032F62","--shiki-dark":"#9ECBFF"},"children":"\"mango\""}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":", "}],["$","span",null,{"style":{"--shiki-light":"#005CC5","--shiki-dark":"#79B8FF"},"children":"20"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":");"}]]}],"\n",["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"}"}]}]]}]]}]]}]}]}]
+33:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"→ 자동으로 JSON으로 변환됨"}]
+34:["$","hr",null,{"className":"x:my-[2em] nextra-border"}]
+35:["$","h2",null,{"id":"6-httpmessageconverter-json-직렬화","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-10 x:border-b x:pb-1 x:text-3xl nextra-border","children":["6. HttpMessageConverter (JSON 직렬화)",["$","$L9",null,{"id":"6-httpmessageconverter-json-직렬화"}]]}]
+36:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"API 서버의 핵심 구성 요소."}]
+37:["$","ul",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-disc x:ms-[1.5em]","children":["\n",["$","li",null,{"className":"x:my-[.5em]","children":"JSON ↔ Java 객체 변환 담당"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":["기본 구현: ",["$","code",null,{"className":"nextra-code","dir":"ltr","children":"MappingJackson2HttpMessageConverter"}]]}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":[["$","code",null,{"className":"nextra-code","dir":"ltr","children":"@ResponseBody"}]," 또는 ",["$","code",null,{"className":"nextra-code","dir":"ltr","children":"@RestController"}],"에서 자동 적용"]}],"\n"]}]
+38:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"동작 순서:"}]
+39:["$","ol",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-decimal x:ms-6","children":["\n",["$","li",null,{"className":"x:my-[.5em]","children":"객체 반환"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"HttpMessageConverter가 JSON으로 변환"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"Content-Type: application/json 설정"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"응답 출력"}],"\n"]}]
+3a:["$","hr",null,{"className":"x:my-[2em] nextra-border"}]
+3b:["$","h2",null,{"id":"7-viewresolver-템플릿-엔진-사용-시","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-10 x:border-b x:pb-1 x:text-3xl nextra-border","children":["7. ViewResolver (템플릿 엔진 사용 시)",["$","$L9",null,{"id":"7-viewresolver-템플릿-엔진-사용-시"}]]}]
+3c:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"Thymeleaf, JSP 등을 사용할 때만 작동.\nREST API 구성에서는 보통 사용하지 않음."}]
+3d:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"역할:"}]
+3e:["$","ul",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-disc x:ms-[1.5em]","children":["\n",["$","li",null,{"className":"x:my-[.5em]","children":"컨트롤러가 반환한 view 이름을 기반으로 실제 템플릿을 찾는다."}],"\n"]}]
+3f:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":["예: ",["$","code",null,{"className":"nextra-code","dir":"ltr","children":"return \"home\";"}]," → ",["$","code",null,{"className":"nextra-code","dir":"ltr","children":"templates/home.html"}]]}]
+40:["$","hr",null,{"className":"x:my-[2em] nextra-border"}]
+41:["$","h2",null,{"id":"8-spring-mvc-전체-요청-흐름-요약","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-10 x:border-b x:pb-1 x:text-3xl nextra-border","children":["8. Spring MVC 전체 요청 흐름 요약",["$","$L9",null,{"id":"8-spring-mvc-전체-요청-흐름-요약"}]]}]
+42:["$","div",null,{"className":"flex justify-start","children":["$","div",null,{"className":"inline-block text-center","children":["$","div",null,{"data-pagefind-ignore":"all","className":"nextra-code x:relative x:not-first:mt-[1.25em]","children":["$undefined",["$","pre",null,{"className":"x:group x:focus-visible:nextra-focus x:overflow-x-auto x:subpixel-antialiased x:text-[.9em] x:bg-white x:dark:bg-black x:py-4 x:ring-1 x:ring-inset x:ring-gray-300 x:dark:ring-neutral-700 x:contrast-more:ring-gray-900 x:contrast-more:dark:ring-gray-50 x:contrast-more:contrast-150 x:rounded-md not-prose","tabIndex":"0","children":[["$","div",null,{"className":"x:group-hover:opacity-100 x:group-focus:opacity-100 x:opacity-0 x:transition x:focus-within:opacity-100 x:flex x:gap-1 x:absolute x:right-4 x:top-2","children":[["$","$La",null,{"children":["$","svg",null,{"viewBox":"0 0 24 24","fill":"currentColor","height":"1em","children":["$","path",null,{"d":"M4 19h6v-2H4v2zM20 5H4v2h16V5zm-3 6H4v2h13.25c1.1 0 2 .9 2 2s-.9 2-2 2H15v-2l-3 3l3 3v-2h2c2.21 0 4-1.79 4-4s-1.79-4-4-4z"}]}]}],false]}],["$","code",null,{"className":"nextra-code","dir":"ltr","children":[["$","span",null,{"children":["$","span",null,{"children":"클라이언트 요청"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"  ↓"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"Filter → Interceptor → DispatcherServlet"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"  ↓"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"HandlerMapping → HandlerAdapter"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"  ↓"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"Controller 실행"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"  ↓"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"ArgumentResolver로 파라미터 주입"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"  ↓"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"ReturnValueHandler로 반환값 처리"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"  ↓"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"HttpMessageConverter(JSON) / ViewResolver"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"  ↓"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"응답 반환"}]}]]}]]}]]}]}]}]
+43:["$","hr",null,{"className":"x:my-[2em] nextra-border"}]
+44:["$","h2",null,{"id":"9-실무-기준-핵심-정리","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-10 x:border-b x:pb-1 x:text-3xl nextra-border","children":["9. 실무 기준 핵심 정리",["$","$L9",null,{"id":"9-실무-기준-핵심-정리"}]]}]
+45:["$","ul",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-disc x:ms-[1.5em]","children":["\n",["$","li",null,{"className":"x:my-[.5em]","children":["DispatcherServlet은 ",["$","strong",null,{"children":"모든 요청의 단일 관문"}],"이다."]}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":["ArgumentResolver/ReturnValueHandler가 MVC의 ",["$","strong",null,{"children":"유연성과 확장성의 핵심"}],"이다."]}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":["API 서버에서는 ",["$","strong",null,{"children":"ViewResolver 대신 HttpMessageConverter"}],"가 중심."]}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"Filter는 Servlet, Interceptor는 Spring MVC 시스템 레벨."}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"컨트롤러 작성만 해도 복잡한 내부 구조가 자동으로 처리된다."}],"\n"]}]
+48:null

@@ -1,0 +1,5 @@
+:HL["/mango-blog/_next/static/chunks/5f84beabef67f03d.css","style"]
+:HL["/mango-blog/_next/static/media/CookieRun_Black-s.p.39ddee86.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
+:HL["/mango-blog/_next/static/media/CookieRun_Bold-s.p.6ac0ca3e.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
+:HL["/mango-blog/_next/static/media/CookieRun_Regular-s.p.1c7b1a53.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
+0:{"buildId":"uaExnbQ2pT_-jQkaFTBLZ","tree":{"name":"","paramType":null,"paramKey":"","hasRuntimePrefetch":false,"slots":{"children":{"name":"mdxPath","paramType":"oc","paramKey":"settings","hasRuntimePrefetch":false,"slots":{"children":{"name":"__PAGE__","paramType":null,"paramKey":"__PAGE__","hasRuntimePrefetch":false,"slots":null,"isRootLayout":false}},"isRootLayout":false}},"isRootLayout":true},"staleTime":300}

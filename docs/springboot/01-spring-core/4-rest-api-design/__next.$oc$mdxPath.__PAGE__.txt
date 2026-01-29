@@ -1,0 +1,488 @@
+1:"$Sreact.fragment"
+2:I[36382,["/mango-blog/_next/static/chunks/508d891aa0792da0.js","/mango-blog/_next/static/chunks/c35a7285345f739e.js","/mango-blog/_next/static/chunks/cea628e83a0a07c2.js","/mango-blog/_next/static/chunks/311bfda68bef2673.js","/mango-blog/_next/static/chunks/8fba60bd4135542a.js","/mango-blog/_next/static/chunks/caa4d2b3cb50cf17.js","/mango-blog/_next/static/chunks/b39b1f344c22c3eb.js","/mango-blog/_next/static/chunks/e1a9aaa3e8d4ba89.js","/mango-blog/_next/static/chunks/36d54e21a0527d75.js","/mango-blog/_next/static/chunks/6beefafa8f4f3a9a.js","/mango-blog/_next/static/chunks/b417336136017bb8.js"],"TOCProvider"]
+3:I[18476,["/mango-blog/_next/static/chunks/508d891aa0792da0.js","/mango-blog/_next/static/chunks/c35a7285345f739e.js","/mango-blog/_next/static/chunks/cea628e83a0a07c2.js","/mango-blog/_next/static/chunks/311bfda68bef2673.js","/mango-blog/_next/static/chunks/8fba60bd4135542a.js","/mango-blog/_next/static/chunks/caa4d2b3cb50cf17.js","/mango-blog/_next/static/chunks/b39b1f344c22c3eb.js","/mango-blog/_next/static/chunks/e1a9aaa3e8d4ba89.js","/mango-blog/_next/static/chunks/36d54e21a0527d75.js","/mango-blog/_next/static/chunks/6beefafa8f4f3a9a.js","/mango-blog/_next/static/chunks/b417336136017bb8.js"],"Sidebar"]
+4:I[83985,["/mango-blog/_next/static/chunks/508d891aa0792da0.js","/mango-blog/_next/static/chunks/c35a7285345f739e.js","/mango-blog/_next/static/chunks/cea628e83a0a07c2.js","/mango-blog/_next/static/chunks/311bfda68bef2673.js","/mango-blog/_next/static/chunks/8fba60bd4135542a.js","/mango-blog/_next/static/chunks/caa4d2b3cb50cf17.js","/mango-blog/_next/static/chunks/b39b1f344c22c3eb.js","/mango-blog/_next/static/chunks/e1a9aaa3e8d4ba89.js","/mango-blog/_next/static/chunks/36d54e21a0527d75.js","/mango-blog/_next/static/chunks/6beefafa8f4f3a9a.js","/mango-blog/_next/static/chunks/b417336136017bb8.js"],"ClientWrapper"]
+9:I[9288,["/mango-blog/_next/static/chunks/508d891aa0792da0.js","/mango-blog/_next/static/chunks/c35a7285345f739e.js","/mango-blog/_next/static/chunks/cea628e83a0a07c2.js","/mango-blog/_next/static/chunks/311bfda68bef2673.js","/mango-blog/_next/static/chunks/8fba60bd4135542a.js","/mango-blog/_next/static/chunks/caa4d2b3cb50cf17.js","/mango-blog/_next/static/chunks/b39b1f344c22c3eb.js","/mango-blog/_next/static/chunks/e1a9aaa3e8d4ba89.js","/mango-blog/_next/static/chunks/36d54e21a0527d75.js","/mango-blog/_next/static/chunks/6beefafa8f4f3a9a.js","/mango-blog/_next/static/chunks/b417336136017bb8.js"],"HeadingAnchor"]
+a:I[34542,["/mango-blog/_next/static/chunks/508d891aa0792da0.js","/mango-blog/_next/static/chunks/c35a7285345f739e.js","/mango-blog/_next/static/chunks/cea628e83a0a07c2.js","/mango-blog/_next/static/chunks/311bfda68bef2673.js","/mango-blog/_next/static/chunks/8fba60bd4135542a.js","/mango-blog/_next/static/chunks/caa4d2b3cb50cf17.js","/mango-blog/_next/static/chunks/b39b1f344c22c3eb.js","/mango-blog/_next/static/chunks/e1a9aaa3e8d4ba89.js","/mango-blog/_next/static/chunks/36d54e21a0527d75.js","/mango-blog/_next/static/chunks/6beefafa8f4f3a9a.js","/mango-blog/_next/static/chunks/b417336136017bb8.js"],"ToggleWordWrapButton"]
+48:I[45297,["/mango-blog/_next/static/chunks/7ceea1baff856d5d.js","/mango-blog/_next/static/chunks/e1fc490196dff2be.js"],"OutletBoundary"]
+49:"$Sreact.suspense"
+5:T20f8,---
+title: REST API 기본 설계
+description: URL 설계, HTTP 메서드, DTO, Validation, 계층 구조까지 실무 기준 REST API 설계 원칙 정리
+date: 2025-11-25
+tags:
+  - spring
+  - rest
+  - api
+  - design
+---
+
+# REST API 기본 설계
+
+이 문서는 **Spring MVC 기반 REST API** 를 설계할 때 기준이 되는 원칙들을 정리한다.
+
+- Resource 중심 URI 설계
+- HTTP 메서드 활용 규칙 (GET/POST/PUT/PATCH/DELETE)
+- Request / Response DTO 설계
+- Validation 구조
+- Controller → Service → Repository 계층 분리
+
+---
+
+## 1. Resource 중심 URI 설계
+
+REST API의 핵심은 **명사형 리소스** 를 중심으로 URI를 설계하는 것이다.
+
+### 1.1 기본 원칙
+
+- 동사는 **HTTP 메서드에 맡기고**, URI는 **리소스를 표현하는 명사**로 작성
+- 복수형 사용: `/users`, `/orders`, `/products`
+- 계층 구조 표현: `/users/{id}/orders/{orderId}`
+
+좋은 예:
+
+<CodeLayout>
+
+```
+GET    /users
+GET    /users/{userId}
+POST   /users
+PUT    /users/{userId}
+DELETE /users/{userId}
+
+GET    /users/{userId}/orders
+GET    /users/{userId}/orders/{orderId}
+```
+
+</CodeLayout>
+
+피해야 할 예:
+
+<CodeLayout>
+
+```
+GET /getUserList
+POST /createNewUser
+GET /doOrderForUser
+```
+
+</CodeLayout>
+
+- 동사 + 의미 불명확한 이름 → 유지보수/검색/문서화에 불리함
+
+---
+
+## 2. HTTP 메서드 활용 규칙
+
+### 2.1 CRUD 매핑
+
+- **GET** → 리소스 조회 (멱등 + 안전)
+- **POST** → 리소스 생성 / 비멱등 처리 요청
+- **PUT** → 리소스 전체 교체 (멱등)
+- **PATCH** → 리소스 일부 변경
+- **DELETE** → 리소스 삭제 (멱등)
+
+<CodeLayout>
+
+```http
+GET    /accounts/100          # 계좌 상세 조회
+POST   /accounts              # 계좌 신규 생성
+PUT    /accounts/100          # 계좌 정보 전체 변경
+PATCH  /accounts/100          # 일부 필드만 변경
+DELETE /accounts/100          # 계좌 삭제(또는 비활성화)
+```
+
+</CodeLayout>
+
+멱등성(idempotency)은 **같은 요청을 여러 번 보내도 결과가 달라지지 않는 성질**을 의미한다.
+
+- GET, PUT, DELETE 는 설계상 멱등하게 만드는 것이 좋다.
+- POST 는 보통 멱등하지 않다(매번 새로운 리소스 생성 등).
+
+---
+
+## 3. Request / Response DTO 설계
+
+### 3.1 엔티티 직접 노출 금지
+
+JPA 엔티티를 그대로 JSON으로 노출하면 다음 문제가 생긴다.
+
+- 양방향 연관관계로 인한 무한 루프
+- 내부 구현 변경이 API 스펙에 그대로 드러남
+- 보안/민감 정보 직접 노출 위험
+
+그래서 **항상 DTO를 별도로 정의**하는 것을 기본 원칙으로 삼는다.
+
+<CodeLayout>
+
+```java
+// 요청 DTO
+public record CreateUserRequest(
+        String email,
+        String name,
+        String password
+) {}
+
+// 응답 DTO
+public record UserResponse(
+        Long id,
+        String email,
+        String name
+) {}
+```
+
+</CodeLayout>
+
+---
+
+### 3.2 Controller에서 DTO 사용 예시
+
+<CodeLayout>
+
+```java
+@RestController
+@RequestMapping("/api/users")
+public class UserController {
+
+    private final UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
+
+    @PostMapping
+    public ResponseEntity<UserResponse> createUser(
+            @RequestBody @Valid CreateUserRequest request
+    ) {
+        UserResponse response = userService.createUser(request);
+        URI location = URI.create("/api/users/" + response.id());
+        return ResponseEntity.created(location).body(response);
+    }
+}
+```
+
+</CodeLayout>
+
+- 요청 바디는 `@RequestBody` + DTO로 받는다.
+- `@Valid` 로 Validation을 함께 적용한다.
+- 생성 API는 **Location 헤더 + 201 Created** 를 사용하는 것이 REST 관점에서 가장 이상적이다.
+
+---
+
+## 4. Validation 구조
+
+### 4.1 Bean Validation 애노테이션 사용
+
+요청 DTO에 JSR-380(Bean Validation) 애노테이션을 사용하면 간결하게 검증 규칙을 정의할 수 있다.
+
+<CodeLayout>
+
+```java
+public record CreateUserRequest(
+
+        @Email
+        @NotBlank
+        String email,
+
+        @NotBlank
+        @Size(min = 2, max = 20)
+        String name,
+
+        @NotBlank
+        @Size(min = 8, max = 50)
+        String password
+) {}
+```
+
+</CodeLayout>
+
+Controller에서는 `@Valid` 또는 `@Validated` 만 붙이면 된다.
+
+<CodeLayout>
+
+```java
+@PostMapping
+public ResponseEntity<UserResponse> createUser(
+        @RequestBody @Valid CreateUserRequest request
+) {
+    ...
+}
+```
+
+</CodeLayout>
+
+검증 실패 시 스프링이 `MethodArgumentNotValidException` 을 던지고,  
+글로벌 예외 처리(`@ControllerAdvice`)에서 **일관된 에러 응답** 으로 변환하면 된다.
+
+(상세 구현은 `5-exception-handling.mdx` 에서 다룸)
+
+---
+
+## 5. 계층 구조 설계 (Controller → Service → Repository)
+
+REST API도 결국 **계층형 아키텍처** 위에서 동작한다.
+
+기본 계층 분리는 아래처럼 가져가는 것이 좋다.
+
+<CodeLayout inner="center">
+
+```
+Controller  →  Service  →  Repository(JPA)
+    ↓            ↓            ↓
+ API 입구     비즈니스      데이터 접근
+               로직
+```
+
+</CodeLayout>
+
+### 5.1 Controller 역할
+
+- HTTP 관련 처리 (URL, 메서드, 헤더, 상태 코드)
+- Request DTO → Service 입력 모델 변환
+- Service 결과 → Response DTO + HTTP 응답으로 변환
+
+### 5.2 Service 역할
+
+- **비즈니스 규칙** 의 중심
+- 트랜잭션 경계(`@Transactional`) 위치
+- 여러 Repository/외부 시스템 조합
+
+### 5.3 Repository 역할
+
+- 순수하게 데이터 접근만 담당 (JPA, MyBatis 등)
+- 비즈니스 로직 X
+
+---
+
+### 5.4 샘플 코드 구조
+
+<CodeLayout>
+
+```java
+@RestController
+@RequestMapping("/api/orders")
+public class OrderController {
+
+    private final OrderService orderService;
+
+    public OrderController(OrderService orderService) {
+        this.orderService = orderService;
+    }
+
+    @PostMapping
+    public ResponseEntity<OrderResponse> createOrder(
+            @RequestBody @Valid CreateOrderRequest request
+    ) {
+        OrderResponse response = orderService.createOrder(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+}
+```
+
+</CodeLayout>
+
+<CodeLayout>
+
+```java
+@Service
+public class OrderService {
+
+    private final OrderRepository orderRepository;
+
+    @Transactional
+    public OrderResponse createOrder(CreateOrderRequest request) {
+        Order order = Order.create(
+                request.userId(),
+                request.productId(),
+                request.quantity()
+        );
+
+        orderRepository.save(order);
+        return new OrderResponse(order.getId(), order.getStatus());
+    }
+}
+```
+
+</CodeLayout>
+
+<CodeLayout>
+
+```java
+public interface OrderRepository extends JpaRepository<Order, Long> {
+}
+```
+
+</CodeLayout>
+
+---
+
+## 6. 응답 형태 설계
+
+### 6.1 단일 리소스 응답
+
+<CodeLayout>
+
+```json
+{
+  "id": 100,
+  "email": "mango@example.com",
+  "name": "망고"
+}
+```
+
+</CodeLayout>
+
+### 6.2 컬렉션 응답
+
+<CodeLayout>
+
+```json
+{
+  "items": [
+    { "id": 1, "name": "상품 A" },
+    { "id": 2, "name": "상품 B" }
+  ],
+  "page": 0,
+  "size": 10,
+  "totalElements": 27,
+  "totalPages": 3
+}
+```
+
+</CodeLayout>
+
+- 단순 배열이 아니라, **메타데이터(page, size, total 등)** 를 함께 내려줘야 클라이언트가 사용하기 편하다.
+
+### 6.3 에러 응답 기본 형태
+
+에러 응답은 **항상 동일한 스키마**를 유지하는 것이 중요하다.
+
+<CodeLayout>
+
+```json
+{
+  "code": "USER_NOT_FOUND",
+  "message": "사용자를 찾을 수 없습니다.",
+  "detail": null,
+  "timestamp": "2025-11-25T22:10:00+09:00",
+  "path": "/api/users/9999"
+}
+```
+
+</CodeLayout>
+
+구체적인 예외 매핑은 `5-exception-handling.mdx` 에서
+`@ControllerAdvice` 기반으로 다룰 예정.
+
+---
+
+## 7. 실무 기준 핵심 정리
+
+- `URI`는 **명사형 리소스 + 계층 구조**로 설계한다.
+- 동사는 HTTP 메서드에 맡기고, URI에 동사 이름을 넣지 않는다.
+- 엔티티를 직접 노출하지 말고 **항상 `DTO`를 사용**한다.
+- 요청 DTO에는 `Bean Validation`을 적극적으로 사용한다.
+- `Controller`는 **HTTP 입출력**, `Service`는 **비즈니스 로직**, `Repository`는 **데이터 접근**만 담당하게 분리한다.
+- 응답 스키마(성공/실패)는 초기에 잘 정해두고, 서비스 전반에서 일관성을 유지한다.0:{"buildId":"uaExnbQ2pT_-jQkaFTBLZ","rsc":["$","$1","c",{"children":[["$","div",null,{"className":"x:mx-auto x:flex x:max-w-(--nextra-content-width)","children":["$","$L2",null,{"value":[{"value":"1. Resource 중심 URI 설계","id":"1-resource-중심-uri-설계","depth":2},{"value":"1.1 기본 원칙","id":"11-기본-원칙","depth":3},{"value":"2. HTTP 메서드 활용 규칙","id":"2-http-메서드-활용-규칙","depth":2},{"value":"2.1 CRUD 매핑","id":"21-crud-매핑","depth":3},{"value":"3. Request / Response DTO 설계","id":"3-request--response-dto-설계","depth":2},{"value":"3.1 엔티티 직접 노출 금지","id":"31-엔티티-직접-노출-금지","depth":3},{"value":"3.2 Controller에서 DTO 사용 예시","id":"32-controller에서-dto-사용-예시","depth":3},{"value":"4. Validation 구조","id":"4-validation-구조","depth":2},{"value":"4.1 Bean Validation 애노테이션 사용","id":"41-bean-validation-애노테이션-사용","depth":3},{"value":"5. 계층 구조 설계 (Controller → Service → Repository)","id":"5-계층-구조-설계-controller--service--repository","depth":2},{"value":"5.1 Controller 역할","id":"51-controller-역할","depth":3},{"value":"5.2 Service 역할","id":"52-service-역할","depth":3},{"value":"5.3 Repository 역할","id":"53-repository-역할","depth":3},{"value":"5.4 샘플 코드 구조","id":"54-샘플-코드-구조","depth":3},{"value":"6. 응답 형태 설계","id":"6-응답-형태-설계","depth":2},{"value":"6.1 단일 리소스 응답","id":"61-단일-리소스-응답","depth":3},{"value":"6.2 컬렉션 응답","id":"62-컬렉션-응답","depth":3},{"value":"6.3 에러 응답 기본 형태","id":"63-에러-응답-기본-형태","depth":3},{"value":"7. 실무 기준 핵심 정리","id":"7-실무-기준-핵심-정리","depth":2}],"children":[["$","$L3",null,{}],["$","$L4",null,{"metadata":{"title":"REST API 기본 설계","description":"URL 설계, HTTP 메서드, DTO, Validation, 계층 구조까지 실무 기준 REST API 설계 원칙 정리","date":"2025-11-25","tags":["spring","rest","api","design"],"filePath":"src/content/springboot/01-spring-core/4-rest-api-design.mdx"},"sourceCode":"$5","children":["$L6","$L7"]}]]}]}],null,"$L8"]}],"loading":null,"isPartial":false}
+6:["$","div",null,{"id":"nextra-skip-nav"}]
+7:["$","main",null,{"data-pagefind-body":true,"children":[["$","h1",null,{"className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-bold x:mt-2 x:text-4xl","children":["REST API 기본 설계","$undefined"]}],"\n",["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":["이 문서는 ",["$","strong",null,{"children":"Spring MVC 기반 REST API"}]," 를 설계할 때 기준이 되는 원칙들을 정리한다."]}],"\n",["$","ul",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-disc x:ms-[1.5em]","children":["\n",["$","li",null,{"className":"x:my-[.5em]","children":"Resource 중심 URI 설계"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"HTTP 메서드 활용 규칙 (GET/POST/PUT/PATCH/DELETE)"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"Request / Response DTO 설계"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"Validation 구조"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"Controller → Service → Repository 계층 분리"}],"\n"]}],"\n",["$","hr",null,{"className":"x:my-[2em] nextra-border"}],"\n",["$","h2",null,{"id":"1-resource-중심-uri-설계","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-10 x:border-b x:pb-1 x:text-3xl nextra-border","children":["1. Resource 중심 URI 설계",["$","$L9",null,{"id":"1-resource-중심-uri-설계"}]]}],"\n",["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":["REST API의 핵심은 ",["$","strong",null,{"children":"명사형 리소스"}]," 를 중심으로 URI를 설계하는 것이다."]}],"\n",["$","h3",null,{"id":"11-기본-원칙","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-8 x:text-2xl","children":["1.1 기본 원칙",["$","$L9",null,{"id":"11-기본-원칙"}]]}],"\n",["$","ul",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-disc x:ms-[1.5em]","children":["\n",["$","li",null,{"className":"x:my-[.5em]","children":["동사는 ",["$","strong",null,{"children":"HTTP 메서드에 맡기고"}],", URI는 ",["$","strong",null,{"children":"리소스를 표현하는 명사"}],"로 작성"]}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":["복수형 사용: ",["$","code",null,{"className":"nextra-code","dir":"ltr","children":"/users"}],", ",["$","code",null,{"className":"nextra-code","dir":"ltr","children":"/orders"}],", ",["$","code",null,{"className":"nextra-code","dir":"ltr","children":"/products"}]]}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":["계층 구조 표현: ",["$","code",null,{"className":"nextra-code","dir":"ltr","children":"/users/{id}/orders/{orderId}"}]]}],"\n"]}],"\n",["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"좋은 예:"}],"\n",["$","div",null,{"className":"flex justify-start","children":["$","div",null,{"className":"inline-block text-left","children":["$","div",null,{"data-pagefind-ignore":"all","className":"nextra-code x:relative x:not-first:mt-[1.25em]","children":["$undefined",["$","pre",null,{"className":"x:group x:focus-visible:nextra-focus x:overflow-x-auto x:subpixel-antialiased x:text-[.9em] x:bg-white x:dark:bg-black x:py-4 x:ring-1 x:ring-inset x:ring-gray-300 x:dark:ring-neutral-700 x:contrast-more:ring-gray-900 x:contrast-more:dark:ring-gray-50 x:contrast-more:contrast-150 x:rounded-md not-prose","tabIndex":"0","children":[["$","div",null,{"className":"x:group-hover:opacity-100 x:group-focus:opacity-100 x:opacity-0 x:transition x:focus-within:opacity-100 x:flex x:gap-1 x:absolute x:right-4 x:top-2","children":[["$","$La",null,{"children":["$","svg",null,{"viewBox":"0 0 24 24","fill":"currentColor","height":"1em","children":["$","path",null,{"d":"M4 19h6v-2H4v2zM20 5H4v2h16V5zm-3 6H4v2h13.25c1.1 0 2 .9 2 2s-.9 2-2 2H15v-2l-3 3l3 3v-2h2c2.21 0 4-1.79 4-4s-1.79-4-4-4z"}]}]}],false]}],["$","code",null,{"className":"nextra-code","dir":"ltr","children":[["$","span",null,{"children":["$","span",null,{"children":"GET    /users"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"GET    /users/{userId}"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"POST   /users"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"PUT    /users/{userId}"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"DELETE /users/{userId}"}]}],"\n",["$","span",null,{"children":["$","span",null,{}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"GET    /users/{userId}/orders"}]}],"\n","$Lb"]}]]}]]}]}]}],"\n","$Lc","\n","$Ld","\n","$Le","\n","$Lf","\n","$L10","\n","$L11","\n","$L12","\n","$L13","\n","$L14","\n","$L15","\n","$L16","\n","$L17","\n","$L18","\n","$L19","\n","$L1a","\n","$L1b","\n","$L1c","\n","$L1d","\n","$L1e","\n","$L1f","\n","$L20","\n","$L21","\n","$L22","\n","$L23","\n","$L24","\n","$L25","\n","$L26","\n","$L27","\n","$L28","\n","$L29","\n","$L2a","\n","$L2b","\n","$L2c","\n","$L2d","\n","$L2e","\n","$L2f","\n","$L30","\n","$L31","\n","$L32","\n","$L33","\n","$L34","\n","$L35","\n","$L36","\n","$L37","\n","$L38","\n","$L39","\n","$L3a","\n","$L3b","\n","$L3c","\n","$L3d","\n","$L3e","\n","$L3f","\n","$L40","\n","$L41","\n","$L42","\n","$L43","\n","$L44","\n","$L45","\n","$L46","\n","$L47"]}]
+8:["$","$L48",null,{"children":["$","$49",null,{"name":"Next.MetadataOutlet","children":"$@4a"}]}]
+b:["$","span",null,{"children":["$","span",null,{"children":"GET    /users/{userId}/orders/{orderId}"}]}]
+c:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"피해야 할 예:"}]
+d:["$","div",null,{"className":"flex justify-start","children":["$","div",null,{"className":"inline-block text-left","children":["$","div",null,{"data-pagefind-ignore":"all","className":"nextra-code x:relative x:not-first:mt-[1.25em]","children":["$undefined",["$","pre",null,{"className":"x:group x:focus-visible:nextra-focus x:overflow-x-auto x:subpixel-antialiased x:text-[.9em] x:bg-white x:dark:bg-black x:py-4 x:ring-1 x:ring-inset x:ring-gray-300 x:dark:ring-neutral-700 x:contrast-more:ring-gray-900 x:contrast-more:dark:ring-gray-50 x:contrast-more:contrast-150 x:rounded-md not-prose","tabIndex":"0","children":[["$","div",null,{"className":"x:group-hover:opacity-100 x:group-focus:opacity-100 x:opacity-0 x:transition x:focus-within:opacity-100 x:flex x:gap-1 x:absolute x:right-4 x:top-2","children":[["$","$La",null,{"children":["$","svg",null,{"viewBox":"0 0 24 24","fill":"currentColor","height":"1em","children":["$","path",null,{"d":"M4 19h6v-2H4v2zM20 5H4v2h16V5zm-3 6H4v2h13.25c1.1 0 2 .9 2 2s-.9 2-2 2H15v-2l-3 3l3 3v-2h2c2.21 0 4-1.79 4-4s-1.79-4-4-4z"}]}]}],false]}],["$","code",null,{"className":"nextra-code","dir":"ltr","children":[["$","span",null,{"children":["$","span",null,{"children":"GET /getUserList"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"POST /createNewUser"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"GET /doOrderForUser"}]}]]}]]}]]}]}]}]
+e:["$","ul",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-disc x:ms-[1.5em]","children":["\n",["$","li",null,{"className":"x:my-[.5em]","children":"동사 + 의미 불명확한 이름 → 유지보수/검색/문서화에 불리함"}],"\n"]}]
+f:["$","hr",null,{"className":"x:my-[2em] nextra-border"}]
+10:["$","h2",null,{"id":"2-http-메서드-활용-규칙","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-10 x:border-b x:pb-1 x:text-3xl nextra-border","children":["2. HTTP 메서드 활용 규칙",["$","$L9",null,{"id":"2-http-메서드-활용-규칙"}]]}]
+11:["$","h3",null,{"id":"21-crud-매핑","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-8 x:text-2xl","children":["2.1 CRUD 매핑",["$","$L9",null,{"id":"21-crud-매핑"}]]}]
+12:["$","ul",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-disc x:ms-[1.5em]","children":["\n",["$","li",null,{"className":"x:my-[.5em]","children":[["$","strong",null,{"children":"GET"}]," → 리소스 조회 (멱등 + 안전)"]}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":[["$","strong",null,{"children":"POST"}]," → 리소스 생성 / 비멱등 처리 요청"]}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":[["$","strong",null,{"children":"PUT"}]," → 리소스 전체 교체 (멱등)"]}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":[["$","strong",null,{"children":"PATCH"}]," → 리소스 일부 변경"]}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":[["$","strong",null,{"children":"DELETE"}]," → 리소스 삭제 (멱등)"]}],"\n"]}]
+13:["$","div",null,{"className":"flex justify-start","children":["$","div",null,{"className":"inline-block text-left","children":["$","div",null,{"data-pagefind-ignore":"all","className":"nextra-code x:relative x:not-first:mt-[1.25em]","children":["$undefined",["$","pre",null,{"className":"x:group x:focus-visible:nextra-focus x:overflow-x-auto x:subpixel-antialiased x:text-[.9em] x:bg-white x:dark:bg-black x:py-4 x:ring-1 x:ring-inset x:ring-gray-300 x:dark:ring-neutral-700 x:contrast-more:ring-gray-900 x:contrast-more:dark:ring-gray-50 x:contrast-more:contrast-150 x:rounded-md not-prose","tabIndex":"0","children":[["$","div",null,{"className":"x:group-hover:opacity-100 x:group-focus:opacity-100 x:opacity-0 x:transition x:focus-within:opacity-100 x:flex x:gap-1 x:absolute x:right-4 x:top-2","children":[["$","$La",null,{"children":["$","svg",null,{"viewBox":"0 0 24 24","fill":"currentColor","height":"1em","children":["$","path",null,{"d":"M4 19h6v-2H4v2zM20 5H4v2h16V5zm-3 6H4v2h13.25c1.1 0 2 .9 2 2s-.9 2-2 2H15v-2l-3 3l3 3v-2h2c2.21 0 4-1.79 4-4s-1.79-4-4-4z"}]}]}],false]}],["$","code",null,{"className":"nextra-code","dir":"ltr","children":[["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"GET"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"    /accounts/100          # 계좌 상세 조회"}]]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"POST"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"   /accounts              # 계좌 신규 생성"}]]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"PUT"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"    /accounts/100          # 계좌 정보 전체 변경"}]]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"PATCH"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"  /accounts/100          # 일부 필드만 변경"}]]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"DELETE"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":" /accounts/100          # 계좌 삭제(또는 비활성화)"}]]}]]}]]}]]}]}]}]
+14:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":["멱등성(idempotency)은 ",["$","strong",null,{"children":"같은 요청을 여러 번 보내도 결과가 달라지지 않는 성질"}],"을 의미한다."]}]
+15:["$","ul",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-disc x:ms-[1.5em]","children":["\n",["$","li",null,{"className":"x:my-[.5em]","children":"GET, PUT, DELETE 는 설계상 멱등하게 만드는 것이 좋다."}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"POST 는 보통 멱등하지 않다(매번 새로운 리소스 생성 등)."}],"\n"]}]
+16:["$","hr",null,{"className":"x:my-[2em] nextra-border"}]
+17:["$","h2",null,{"id":"3-request--response-dto-설계","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-10 x:border-b x:pb-1 x:text-3xl nextra-border","children":["3. Request / Response DTO 설계",["$","$L9",null,{"id":"3-request--response-dto-설계"}]]}]
+18:["$","h3",null,{"id":"31-엔티티-직접-노출-금지","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-8 x:text-2xl","children":["3.1 엔티티 직접 노출 금지",["$","$L9",null,{"id":"31-엔티티-직접-노출-금지"}]]}]
+19:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"JPA 엔티티를 그대로 JSON으로 노출하면 다음 문제가 생긴다."}]
+1a:["$","ul",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-disc x:ms-[1.5em]","children":["\n",["$","li",null,{"className":"x:my-[.5em]","children":"양방향 연관관계로 인한 무한 루프"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"내부 구현 변경이 API 스펙에 그대로 드러남"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"보안/민감 정보 직접 노출 위험"}],"\n"]}]
+1b:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":["그래서 ",["$","strong",null,{"children":"항상 DTO를 별도로 정의"}],"하는 것을 기본 원칙으로 삼는다."]}]
+1c:["$","div",null,{"className":"flex justify-start","children":["$","div",null,{"className":"inline-block text-left","children":["$","div",null,{"data-pagefind-ignore":"all","className":"nextra-code x:relative x:not-first:mt-[1.25em]","children":["$undefined",["$","pre",null,{"className":"x:group x:focus-visible:nextra-focus x:overflow-x-auto x:subpixel-antialiased x:text-[.9em] x:bg-white x:dark:bg-black x:py-4 x:ring-1 x:ring-inset x:ring-gray-300 x:dark:ring-neutral-700 x:contrast-more:ring-gray-900 x:contrast-more:dark:ring-gray-50 x:contrast-more:contrast-150 x:rounded-md not-prose","tabIndex":"0","children":[["$","div",null,{"className":"x:group-hover:opacity-100 x:group-focus:opacity-100 x:opacity-0 x:transition x:focus-within:opacity-100 x:flex x:gap-1 x:absolute x:right-4 x:top-2","children":[["$","$La",null,{"children":["$","svg",null,{"viewBox":"0 0 24 24","fill":"currentColor","height":"1em","children":["$","path",null,{"d":"M4 19h6v-2H4v2zM20 5H4v2h16V5zm-3 6H4v2h13.25c1.1 0 2 .9 2 2s-.9 2-2 2H15v-2l-3 3l3 3v-2h2c2.21 0 4-1.79 4-4s-1.79-4-4-4z"}]}]}],false]}],["$","code",null,{"className":"nextra-code","dir":"ltr","children":[["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#6A737D","--shiki-dark":"#6A737D"},"children":"// 요청 DTO"}]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"public"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":" record"}],["$","span",null,{"style":{"--shiki-light":"#6F42C1","--shiki-dark":"#B392F0"},"children":" CreateUserRequest"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"("}]]}],"\n",["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"        String email,"}]}],"\n",["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"        String name,"}]}],"\n",["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"        String password"}]}],"\n",["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":") {}"}]}],"\n",["$","span",null,{"children":" "}],"\n",["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#6A737D","--shiki-dark":"#6A737D"},"children":"// 응답 DTO"}]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"public"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":" record"}],["$","span",null,{"style":{"--shiki-light":"#6F42C1","--shiki-dark":"#B392F0"},"children":" UserResponse"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"("}]]}],"\n",["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"        Long id,"}]}],"\n",["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"        String email,"}]}],"\n",["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"        String name"}]}],"\n",["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":") {}"}]}]]}]]}]]}]}]}]
+1d:["$","hr",null,{"className":"x:my-[2em] nextra-border"}]
+1e:["$","h3",null,{"id":"32-controller에서-dto-사용-예시","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-8 x:text-2xl","children":["3.2 Controller에서 DTO 사용 예시",["$","$L9",null,{"id":"32-controller에서-dto-사용-예시"}]]}]
+1f:["$","div",null,{"className":"flex justify-start","children":["$","div",null,{"className":"inline-block text-left","children":["$","div",null,{"data-pagefind-ignore":"all","className":"nextra-code x:relative x:not-first:mt-[1.25em]","children":["$undefined",["$","pre",null,{"className":"x:group x:focus-visible:nextra-focus x:overflow-x-auto x:subpixel-antialiased x:text-[.9em] x:bg-white x:dark:bg-black x:py-4 x:ring-1 x:ring-inset x:ring-gray-300 x:dark:ring-neutral-700 x:contrast-more:ring-gray-900 x:contrast-more:dark:ring-gray-50 x:contrast-more:contrast-150 x:rounded-md not-prose","tabIndex":"0","children":[["$","div",null,{"className":"x:group-hover:opacity-100 x:group-focus:opacity-100 x:opacity-0 x:transition x:focus-within:opacity-100 x:flex x:gap-1 x:absolute x:right-4 x:top-2","children":[["$","$La",null,{"children":["$","svg",null,{"viewBox":"0 0 24 24","fill":"currentColor","height":"1em","children":["$","path",null,{"d":"M4 19h6v-2H4v2zM20 5H4v2h16V5zm-3 6H4v2h13.25c1.1 0 2 .9 2 2s-.9 2-2 2H15v-2l-3 3l3 3v-2h2c2.21 0 4-1.79 4-4s-1.79-4-4-4z"}]}]}],false]}],["$","code",null,{"className":"nextra-code","dir":"ltr","children":[["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"@"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"RestController"}]]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"@"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"RequestMapping"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"("}],["$","span",null,{"style":{"--shiki-light":"#032F62","--shiki-dark":"#9ECBFF"},"children":"\"/api/users\""}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":")"}]]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"public"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":" class"}],["$","span",null,{"style":{"--shiki-light":"#6F42C1","--shiki-dark":"#B392F0"},"children":" UserController"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":" {"}]]}],"\n",["$","span",null,{"children":" "}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"    private"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":" final"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":" UserService userService;"}]]}],"\n",["$","span",null,{"children":" "}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"    public"}],["$","span",null,{"style":{"--shiki-light":"#6F42C1","--shiki-dark":"#B392F0"},"children":" UserController"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"(UserService "}],["$","span",null,{"style":{"--shiki-light":"#E36209","--shiki-dark":"#FFAB70"},"children":"userService"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":") {"}]]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#005CC5","--shiki-dark":"#79B8FF"},"children":"        this"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":".userService "}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"="}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":" userService;"}]]}],"\n",["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"    }"}]}],"\n",["$","span",null,{"children":" "}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"    @"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"PostMapping"}]]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"    public"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":" ResponseEntity<"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"UserResponse"}],"$L4b","$L4c","$L4d"]}],"\n","$L4e","\n","$L4f","\n","$L50","\n","$L51","\n","$L52","\n","$L53","\n","$L54"]}]]}]]}]}]}]
+20:["$","ul",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-disc x:ms-[1.5em]","children":["\n",["$","li",null,{"className":"x:my-[.5em]","children":["요청 바디는 ",["$","code",null,{"className":"nextra-code","dir":"ltr","children":"@RequestBody"}]," + DTO로 받는다."]}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":[["$","code",null,{"className":"nextra-code","dir":"ltr","children":"@Valid"}]," 로 Validation을 함께 적용한다."]}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":["생성 API는 ",["$","strong",null,{"children":"Location 헤더 + 201 Created"}]," 를 사용하는 것이 REST 관점에서 가장 이상적이다."]}],"\n"]}]
+21:["$","hr",null,{"className":"x:my-[2em] nextra-border"}]
+22:["$","h2",null,{"id":"4-validation-구조","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-10 x:border-b x:pb-1 x:text-3xl nextra-border","children":["4. Validation 구조",["$","$L9",null,{"id":"4-validation-구조"}]]}]
+23:["$","h3",null,{"id":"41-bean-validation-애노테이션-사용","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-8 x:text-2xl","children":["4.1 Bean Validation 애노테이션 사용",["$","$L9",null,{"id":"41-bean-validation-애노테이션-사용"}]]}]
+24:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"요청 DTO에 JSR-380(Bean Validation) 애노테이션을 사용하면 간결하게 검증 규칙을 정의할 수 있다."}]
+25:["$","div",null,{"className":"flex justify-start","children":["$","div",null,{"className":"inline-block text-left","children":["$","div",null,{"data-pagefind-ignore":"all","className":"nextra-code x:relative x:not-first:mt-[1.25em]","children":["$undefined",["$","pre",null,{"className":"x:group x:focus-visible:nextra-focus x:overflow-x-auto x:subpixel-antialiased x:text-[.9em] x:bg-white x:dark:bg-black x:py-4 x:ring-1 x:ring-inset x:ring-gray-300 x:dark:ring-neutral-700 x:contrast-more:ring-gray-900 x:contrast-more:dark:ring-gray-50 x:contrast-more:contrast-150 x:rounded-md not-prose","tabIndex":"0","children":[["$","div",null,{"className":"x:group-hover:opacity-100 x:group-focus:opacity-100 x:opacity-0 x:transition x:focus-within:opacity-100 x:flex x:gap-1 x:absolute x:right-4 x:top-2","children":[["$","$La",null,{"children":["$","svg",null,{"viewBox":"0 0 24 24","fill":"currentColor","height":"1em","children":["$","path",null,{"d":"M4 19h6v-2H4v2zM20 5H4v2h16V5zm-3 6H4v2h13.25c1.1 0 2 .9 2 2s-.9 2-2 2H15v-2l-3 3l3 3v-2h2c2.21 0 4-1.79 4-4s-1.79-4-4-4z"}]}]}],false]}],["$","code",null,{"className":"nextra-code","dir":"ltr","children":[["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"public"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":" record"}],["$","span",null,{"style":{"--shiki-light":"#6F42C1","--shiki-dark":"#B392F0"},"children":" CreateUserRequest"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"("}]]}],"\n",["$","span",null,{"children":" "}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"        @"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"Email"}]]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"        @"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"NotBlank"}]]}],"\n",["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"        String email,"}]}],"\n",["$","span",null,{"children":" "}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"        @"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"NotBlank"}]]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"        @"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"Size"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"("}],["$","span",null,{"style":{"--shiki-light":"#005CC5","--shiki-dark":"#79B8FF"},"children":"min"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":" ="}],["$","span",null,{"style":{"--shiki-light":"#005CC5","--shiki-dark":"#79B8FF"},"children":" 2"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":", "}],["$","span",null,{"style":{"--shiki-light":"#005CC5","--shiki-dark":"#79B8FF"},"children":"max"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":" ="}],["$","span",null,{"style":{"--shiki-light":"#005CC5","--shiki-dark":"#79B8FF"},"children":" 20"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":")"}]]}],"\n",["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"        String name,"}]}],"\n",["$","span",null,{"children":" "}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"        @"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"NotBlank"}]]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"        @"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"Size"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"("}],["$","span",null,{"style":{"--shiki-light":"#005CC5","--shiki-dark":"#79B8FF"},"children":"min"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":" ="}],["$","span",null,{"style":{"--shiki-light":"#005CC5","--shiki-dark":"#79B8FF"},"children":" 8"}],"$L55","$L56","$L57","$L58","$L59"]}],"\n","$L5a","\n","$L5b"]}]]}]]}]}]}]
+26:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":["Controller에서는 ",["$","code",null,{"className":"nextra-code","dir":"ltr","children":"@Valid"}]," 또는 ",["$","code",null,{"className":"nextra-code","dir":"ltr","children":"@Validated"}]," 만 붙이면 된다."]}]
+27:["$","div",null,{"className":"flex justify-start","children":["$","div",null,{"className":"inline-block text-left","children":["$","div",null,{"data-pagefind-ignore":"all","className":"nextra-code x:relative x:not-first:mt-[1.25em]","children":["$undefined",["$","pre",null,{"className":"x:group x:focus-visible:nextra-focus x:overflow-x-auto x:subpixel-antialiased x:text-[.9em] x:bg-white x:dark:bg-black x:py-4 x:ring-1 x:ring-inset x:ring-gray-300 x:dark:ring-neutral-700 x:contrast-more:ring-gray-900 x:contrast-more:dark:ring-gray-50 x:contrast-more:contrast-150 x:rounded-md not-prose","tabIndex":"0","children":[["$","div",null,{"className":"x:group-hover:opacity-100 x:group-focus:opacity-100 x:opacity-0 x:transition x:focus-within:opacity-100 x:flex x:gap-1 x:absolute x:right-4 x:top-2","children":[["$","$La",null,{"children":["$","svg",null,{"viewBox":"0 0 24 24","fill":"currentColor","height":"1em","children":["$","path",null,{"d":"M4 19h6v-2H4v2zM20 5H4v2h16V5zm-3 6H4v2h13.25c1.1 0 2 .9 2 2s-.9 2-2 2H15v-2l-3 3l3 3v-2h2c2.21 0 4-1.79 4-4s-1.79-4-4-4z"}]}]}],false]}],["$","code",null,{"className":"nextra-code","dir":"ltr","children":[["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"@"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"PostMapping"}]]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"public"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":" ResponseEntity"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"<"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"UserResponse"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":">"}],["$","span",null,{"style":{"--shiki-light":"#6F42C1","--shiki-dark":"#B392F0"},"children":" createUser"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"("}]]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"        @"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"RequestBody"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":" @"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"Valid"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":" CreateUserRequest request"}]]}],"\n",["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":") {"}]}],"\n",["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"    ..."}]}],"\n",["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"}"}]}]]}]]}]]}]}]}]
+28:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":["검증 실패 시 스프링이 ",["$","code",null,{"className":"nextra-code","dir":"ltr","children":"MethodArgumentNotValidException"}]," 을 던지고,",["$","br",null,{}],"\n","글로벌 예외 처리(",["$","code",null,{"className":"nextra-code","dir":"ltr","children":"@ControllerAdvice"}],")에서 ",["$","strong",null,{"children":"일관된 에러 응답"}]," 으로 변환하면 된다."]}]
+29:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":["(상세 구현은 ",["$","code",null,{"className":"nextra-code","dir":"ltr","children":"5-exception-handling.mdx"}]," 에서 다룸)"]}]
+2a:["$","hr",null,{"className":"x:my-[2em] nextra-border"}]
+2b:["$","h2",null,{"id":"5-계층-구조-설계-controller--service--repository","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-10 x:border-b x:pb-1 x:text-3xl nextra-border","children":["5. 계층 구조 설계 (Controller → Service → Repository)",["$","$L9",null,{"id":"5-계층-구조-설계-controller--service--repository"}]]}]
+2c:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":["REST API도 결국 ",["$","strong",null,{"children":"계층형 아키텍처"}]," 위에서 동작한다."]}]
+2d:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"기본 계층 분리는 아래처럼 가져가는 것이 좋다."}]
+2e:["$","div",null,{"className":"flex justify-start","children":["$","div",null,{"className":"inline-block text-center","children":["$","div",null,{"data-pagefind-ignore":"all","className":"nextra-code x:relative x:not-first:mt-[1.25em]","children":["$undefined",["$","pre",null,{"className":"x:group x:focus-visible:nextra-focus x:overflow-x-auto x:subpixel-antialiased x:text-[.9em] x:bg-white x:dark:bg-black x:py-4 x:ring-1 x:ring-inset x:ring-gray-300 x:dark:ring-neutral-700 x:contrast-more:ring-gray-900 x:contrast-more:dark:ring-gray-50 x:contrast-more:contrast-150 x:rounded-md not-prose","tabIndex":"0","children":[["$","div",null,{"className":"x:group-hover:opacity-100 x:group-focus:opacity-100 x:opacity-0 x:transition x:focus-within:opacity-100 x:flex x:gap-1 x:absolute x:right-4 x:top-2","children":[["$","$La",null,{"children":["$","svg",null,{"viewBox":"0 0 24 24","fill":"currentColor","height":"1em","children":["$","path",null,{"d":"M4 19h6v-2H4v2zM20 5H4v2h16V5zm-3 6H4v2h13.25c1.1 0 2 .9 2 2s-.9 2-2 2H15v-2l-3 3l3 3v-2h2c2.21 0 4-1.79 4-4s-1.79-4-4-4z"}]}]}],false]}],["$","code",null,{"className":"nextra-code","dir":"ltr","children":[["$","span",null,{"children":["$","span",null,{"children":"Controller  →  Service  →  Repository(JPA)"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"    ↓            ↓            ↓"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":" API 입구     비즈니스      데이터 접근"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"               로직"}]}]]}]]}]]}]}]}]
+2f:["$","h3",null,{"id":"51-controller-역할","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-8 x:text-2xl","children":["5.1 Controller 역할",["$","$L9",null,{"id":"51-controller-역할"}]]}]
+30:["$","ul",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-disc x:ms-[1.5em]","children":["\n",["$","li",null,{"className":"x:my-[.5em]","children":"HTTP 관련 처리 (URL, 메서드, 헤더, 상태 코드)"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"Request DTO → Service 입력 모델 변환"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"Service 결과 → Response DTO + HTTP 응답으로 변환"}],"\n"]}]
+31:["$","h3",null,{"id":"52-service-역할","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-8 x:text-2xl","children":["5.2 Service 역할",["$","$L9",null,{"id":"52-service-역할"}]]}]
+32:["$","ul",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-disc x:ms-[1.5em]","children":["\n",["$","li",null,{"className":"x:my-[.5em]","children":[["$","strong",null,{"children":"비즈니스 규칙"}]," 의 중심"]}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":["트랜잭션 경계(",["$","code",null,{"className":"nextra-code","dir":"ltr","children":"@Transactional"}],") 위치"]}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"여러 Repository/외부 시스템 조합"}],"\n"]}]
+33:["$","h3",null,{"id":"53-repository-역할","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-8 x:text-2xl","children":["5.3 Repository 역할",["$","$L9",null,{"id":"53-repository-역할"}]]}]
+34:["$","ul",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-disc x:ms-[1.5em]","children":["\n",["$","li",null,{"className":"x:my-[.5em]","children":"순수하게 데이터 접근만 담당 (JPA, MyBatis 등)"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"비즈니스 로직 X"}],"\n"]}]
+35:["$","hr",null,{"className":"x:my-[2em] nextra-border"}]
+36:["$","h3",null,{"id":"54-샘플-코드-구조","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-8 x:text-2xl","children":["5.4 샘플 코드 구조",["$","$L9",null,{"id":"54-샘플-코드-구조"}]]}]
+37:["$","div",null,{"className":"flex justify-start","children":["$","div",null,{"className":"inline-block text-left","children":["$","div",null,{"data-pagefind-ignore":"all","className":"nextra-code x:relative x:not-first:mt-[1.25em]","children":["$undefined",["$","pre",null,{"className":"x:group x:focus-visible:nextra-focus x:overflow-x-auto x:subpixel-antialiased x:text-[.9em] x:bg-white x:dark:bg-black x:py-4 x:ring-1 x:ring-inset x:ring-gray-300 x:dark:ring-neutral-700 x:contrast-more:ring-gray-900 x:contrast-more:dark:ring-gray-50 x:contrast-more:contrast-150 x:rounded-md not-prose","tabIndex":"0","children":[["$","div",null,{"className":"x:group-hover:opacity-100 x:group-focus:opacity-100 x:opacity-0 x:transition x:focus-within:opacity-100 x:flex x:gap-1 x:absolute x:right-4 x:top-2","children":[["$","$La",null,{"children":["$","svg",null,{"viewBox":"0 0 24 24","fill":"currentColor","height":"1em","children":["$","path",null,{"d":"M4 19h6v-2H4v2zM20 5H4v2h16V5zm-3 6H4v2h13.25c1.1 0 2 .9 2 2s-.9 2-2 2H15v-2l-3 3l3 3v-2h2c2.21 0 4-1.79 4-4s-1.79-4-4-4z"}]}]}],false]}],["$","code",null,{"className":"nextra-code","dir":"ltr","children":[["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"@"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"RestController"}]]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"@"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"RequestMapping"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"("}],["$","span",null,{"style":{"--shiki-light":"#032F62","--shiki-dark":"#9ECBFF"},"children":"\"/api/orders\""}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":")"}]]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"public"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":" class"}],["$","span",null,{"style":{"--shiki-light":"#6F42C1","--shiki-dark":"#B392F0"},"children":" OrderController"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":" {"}]]}],"\n",["$","span",null,{"children":" "}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"    private"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":" final"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":" OrderService orderService;"}]]}],"\n",["$","span",null,{"children":" "}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"    public"}],["$","span",null,{"style":{"--shiki-light":"#6F42C1","--shiki-dark":"#B392F0"},"children":" OrderController"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"(OrderService "}],["$","span",null,{"style":{"--shiki-light":"#E36209","--shiki-dark":"#FFAB70"},"children":"orderService"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":") {"}]]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#005CC5","--shiki-dark":"#79B8FF"},"children":"        this"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":".orderService "}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"="}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":" orderService;"}]]}],"\n",["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"    }"}]}],"\n",["$","span",null,{"children":" "}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"    @"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"PostMapping"}]]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"    public"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":" ResponseEntity<"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"OrderResponse"}],"$L5c","$L5d","$L5e"]}],"\n","$L5f","\n","$L60","\n","$L61","\n","$L62","\n","$L63","\n","$L64"]}]]}]]}]}]}]
+38:["$","div",null,{"className":"flex justify-start","children":["$","div",null,{"className":"inline-block text-left","children":["$","div",null,{"data-pagefind-ignore":"all","className":"nextra-code x:relative x:not-first:mt-[1.25em]","children":["$undefined",["$","pre",null,{"className":"x:group x:focus-visible:nextra-focus x:overflow-x-auto x:subpixel-antialiased x:text-[.9em] x:bg-white x:dark:bg-black x:py-4 x:ring-1 x:ring-inset x:ring-gray-300 x:dark:ring-neutral-700 x:contrast-more:ring-gray-900 x:contrast-more:dark:ring-gray-50 x:contrast-more:contrast-150 x:rounded-md not-prose","tabIndex":"0","children":[["$","div",null,{"className":"x:group-hover:opacity-100 x:group-focus:opacity-100 x:opacity-0 x:transition x:focus-within:opacity-100 x:flex x:gap-1 x:absolute x:right-4 x:top-2","children":[["$","$La",null,{"children":["$","svg",null,{"viewBox":"0 0 24 24","fill":"currentColor","height":"1em","children":["$","path",null,{"d":"M4 19h6v-2H4v2zM20 5H4v2h16V5zm-3 6H4v2h13.25c1.1 0 2 .9 2 2s-.9 2-2 2H15v-2l-3 3l3 3v-2h2c2.21 0 4-1.79 4-4s-1.79-4-4-4z"}]}]}],false]}],["$","code",null,{"className":"nextra-code","dir":"ltr","children":[["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"@"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"Service"}]]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"public"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":" class"}],["$","span",null,{"style":{"--shiki-light":"#6F42C1","--shiki-dark":"#B392F0"},"children":" OrderService"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":" {"}]]}],"\n",["$","span",null,{"children":" "}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"    private"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":" final"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":" OrderRepository orderRepository;"}]]}],"\n",["$","span",null,{"children":" "}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"    @"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"Transactional"}]]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"    public"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":" OrderResponse "}],["$","span",null,{"style":{"--shiki-light":"#6F42C1","--shiki-dark":"#B392F0"},"children":"createOrder"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"(CreateOrderRequest "}],["$","span",null,{"style":{"--shiki-light":"#E36209","--shiki-dark":"#FFAB70"},"children":"request"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":") {"}]]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"        Order order "}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"="}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":" Order."}],["$","span",null,{"style":{"--shiki-light":"#6F42C1","--shiki-dark":"#B392F0"},"children":"create"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"("}]]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"                request."}],["$","span",null,{"style":{"--shiki-light":"#6F42C1","--shiki-dark":"#B392F0"},"children":"userId"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"(),"}]]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"                request."}],["$","span",null,{"style":{"--shiki-light":"#6F42C1","--shiki-dark":"#B392F0"},"children":"productId"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"(),"}]]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"                request."}],"$L65","$L66"]}],"\n","$L67","\n","$L68","\n","$L69","\n","$L6a","\n","$L6b","\n","$L6c"]}]]}]]}]}]}]
+39:["$","div",null,{"className":"flex justify-start","children":["$","div",null,{"className":"inline-block text-left","children":["$","div",null,{"data-pagefind-ignore":"all","className":"nextra-code x:relative x:not-first:mt-[1.25em]","children":["$undefined",["$","pre",null,{"className":"x:group x:focus-visible:nextra-focus x:overflow-x-auto x:subpixel-antialiased x:text-[.9em] x:bg-white x:dark:bg-black x:py-4 x:ring-1 x:ring-inset x:ring-gray-300 x:dark:ring-neutral-700 x:contrast-more:ring-gray-900 x:contrast-more:dark:ring-gray-50 x:contrast-more:contrast-150 x:rounded-md not-prose","tabIndex":"0","children":[["$","div",null,{"className":"x:group-hover:opacity-100 x:group-focus:opacity-100 x:opacity-0 x:transition x:focus-within:opacity-100 x:flex x:gap-1 x:absolute x:right-4 x:top-2","children":[["$","$La",null,{"children":["$","svg",null,{"viewBox":"0 0 24 24","fill":"currentColor","height":"1em","children":["$","path",null,{"d":"M4 19h6v-2H4v2zM20 5H4v2h16V5zm-3 6H4v2h13.25c1.1 0 2 .9 2 2s-.9 2-2 2H15v-2l-3 3l3 3v-2h2c2.21 0 4-1.79 4-4s-1.79-4-4-4z"}]}]}],false]}],["$","code",null,{"className":"nextra-code","dir":"ltr","children":[["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"public"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":" interface"}],["$","span",null,{"style":{"--shiki-light":"#6F42C1","--shiki-dark":"#B392F0"},"children":" OrderRepository"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":" extends"}],["$","span",null,{"style":{"--shiki-light":"#6F42C1","--shiki-dark":"#B392F0"},"children":" JpaRepository"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"<"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"Order"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":", "}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"Long"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"> {"}]]}],"\n",["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"}"}]}]]}]]}]]}]}]}]
+3a:["$","hr",null,{"className":"x:my-[2em] nextra-border"}]
+3b:["$","h2",null,{"id":"6-응답-형태-설계","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-10 x:border-b x:pb-1 x:text-3xl nextra-border","children":["6. 응답 형태 설계",["$","$L9",null,{"id":"6-응답-형태-설계"}]]}]
+3c:["$","h3",null,{"id":"61-단일-리소스-응답","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-8 x:text-2xl","children":["6.1 단일 리소스 응답",["$","$L9",null,{"id":"61-단일-리소스-응답"}]]}]
+3d:["$","div",null,{"className":"flex justify-start","children":["$","div",null,{"className":"inline-block text-left","children":["$","div",null,{"data-pagefind-ignore":"all","className":"nextra-code x:relative x:not-first:mt-[1.25em]","children":["$undefined",["$","pre",null,{"className":"x:group x:focus-visible:nextra-focus x:overflow-x-auto x:subpixel-antialiased x:text-[.9em] x:bg-white x:dark:bg-black x:py-4 x:ring-1 x:ring-inset x:ring-gray-300 x:dark:ring-neutral-700 x:contrast-more:ring-gray-900 x:contrast-more:dark:ring-gray-50 x:contrast-more:contrast-150 x:rounded-md not-prose","tabIndex":"0","children":[["$","div",null,{"className":"x:group-hover:opacity-100 x:group-focus:opacity-100 x:opacity-0 x:transition x:focus-within:opacity-100 x:flex x:gap-1 x:absolute x:right-4 x:top-2","children":[["$","$La",null,{"children":["$","svg",null,{"viewBox":"0 0 24 24","fill":"currentColor","height":"1em","children":["$","path",null,{"d":"M4 19h6v-2H4v2zM20 5H4v2h16V5zm-3 6H4v2h13.25c1.1 0 2 .9 2 2s-.9 2-2 2H15v-2l-3 3l3 3v-2h2c2.21 0 4-1.79 4-4s-1.79-4-4-4z"}]}]}],false]}],["$","code",null,{"className":"nextra-code","dir":"ltr","children":[["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"{"}]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#005CC5","--shiki-dark":"#79B8FF"},"children":"  \"id\""}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":": "}],["$","span",null,{"style":{"--shiki-light":"#005CC5","--shiki-dark":"#79B8FF"},"children":"100"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":","}]]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#005CC5","--shiki-dark":"#79B8FF"},"children":"  \"email\""}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":": "}],["$","span",null,{"style":{"--shiki-light":"#032F62","--shiki-dark":"#9ECBFF"},"children":"\"mango@example.com\""}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":","}]]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#005CC5","--shiki-dark":"#79B8FF"},"children":"  \"name\""}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":": "}],["$","span",null,{"style":{"--shiki-light":"#032F62","--shiki-dark":"#9ECBFF"},"children":"\"망고\""}]]}],"\n",["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"}"}]}]]}]]}]]}]}]}]
+3e:["$","h3",null,{"id":"62-컬렉션-응답","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-8 x:text-2xl","children":["6.2 컬렉션 응답",["$","$L9",null,{"id":"62-컬렉션-응답"}]]}]
+3f:["$","div",null,{"className":"flex justify-start","children":["$","div",null,{"className":"inline-block text-left","children":["$","div",null,{"data-pagefind-ignore":"all","className":"nextra-code x:relative x:not-first:mt-[1.25em]","children":["$undefined",["$","pre",null,{"className":"x:group x:focus-visible:nextra-focus x:overflow-x-auto x:subpixel-antialiased x:text-[.9em] x:bg-white x:dark:bg-black x:py-4 x:ring-1 x:ring-inset x:ring-gray-300 x:dark:ring-neutral-700 x:contrast-more:ring-gray-900 x:contrast-more:dark:ring-gray-50 x:contrast-more:contrast-150 x:rounded-md not-prose","tabIndex":"0","children":[["$","div",null,{"className":"x:group-hover:opacity-100 x:group-focus:opacity-100 x:opacity-0 x:transition x:focus-within:opacity-100 x:flex x:gap-1 x:absolute x:right-4 x:top-2","children":[["$","$La",null,{"children":["$","svg",null,{"viewBox":"0 0 24 24","fill":"currentColor","height":"1em","children":["$","path",null,{"d":"M4 19h6v-2H4v2zM20 5H4v2h16V5zm-3 6H4v2h13.25c1.1 0 2 .9 2 2s-.9 2-2 2H15v-2l-3 3l3 3v-2h2c2.21 0 4-1.79 4-4s-1.79-4-4-4z"}]}]}],false]}],["$","code",null,{"className":"nextra-code","dir":"ltr","children":[["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"{"}]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#005CC5","--shiki-dark":"#79B8FF"},"children":"  \"items\""}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":": ["}]]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"    { "}],["$","span",null,{"style":{"--shiki-light":"#005CC5","--shiki-dark":"#79B8FF"},"children":"\"id\""}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":": "}],["$","span",null,{"style":{"--shiki-light":"#005CC5","--shiki-dark":"#79B8FF"},"children":"1"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":", "}],["$","span",null,{"style":{"--shiki-light":"#005CC5","--shiki-dark":"#79B8FF"},"children":"\"name\""}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":": "}],["$","span",null,{"style":{"--shiki-light":"#032F62","--shiki-dark":"#9ECBFF"},"children":"\"상품 A\""}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":" },"}]]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"    { "}],["$","span",null,{"style":{"--shiki-light":"#005CC5","--shiki-dark":"#79B8FF"},"children":"\"id\""}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":": "}],["$","span",null,{"style":{"--shiki-light":"#005CC5","--shiki-dark":"#79B8FF"},"children":"2"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":", "}],["$","span",null,{"style":{"--shiki-light":"#005CC5","--shiki-dark":"#79B8FF"},"children":"\"name\""}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":": "}],["$","span",null,{"style":{"--shiki-light":"#032F62","--shiki-dark":"#9ECBFF"},"children":"\"상품 B\""}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":" }"}]]}],"\n",["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"  ],"}]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#005CC5","--shiki-dark":"#79B8FF"},"children":"  \"page\""}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":": "}],["$","span",null,{"style":{"--shiki-light":"#005CC5","--shiki-dark":"#79B8FF"},"children":"0"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":","}]]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#005CC5","--shiki-dark":"#79B8FF"},"children":"  \"size\""}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":": "}],["$","span",null,{"style":{"--shiki-light":"#005CC5","--shiki-dark":"#79B8FF"},"children":"10"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":","}]]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#005CC5","--shiki-dark":"#79B8FF"},"children":"  \"totalElements\""}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":": "}],["$","span",null,{"style":{"--shiki-light":"#005CC5","--shiki-dark":"#79B8FF"},"children":"27"}],"$L6d"]}],"\n","$L6e","\n","$L6f"]}]]}]]}]}]}]
+40:["$","ul",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-disc x:ms-[1.5em]","children":["\n",["$","li",null,{"className":"x:my-[.5em]","children":["단순 배열이 아니라, ",["$","strong",null,{"children":"메타데이터(page, size, total 등)"}]," 를 함께 내려줘야 클라이언트가 사용하기 편하다."]}],"\n"]}]
+41:["$","h3",null,{"id":"63-에러-응답-기본-형태","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-8 x:text-2xl","children":["6.3 에러 응답 기본 형태",["$","$L9",null,{"id":"63-에러-응답-기본-형태"}]]}]
+42:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":["에러 응답은 ",["$","strong",null,{"children":"항상 동일한 스키마"}],"를 유지하는 것이 중요하다."]}]
+43:["$","div",null,{"className":"flex justify-start","children":["$","div",null,{"className":"inline-block text-left","children":["$","div",null,{"data-pagefind-ignore":"all","className":"nextra-code x:relative x:not-first:mt-[1.25em]","children":["$undefined",["$","pre",null,{"className":"x:group x:focus-visible:nextra-focus x:overflow-x-auto x:subpixel-antialiased x:text-[.9em] x:bg-white x:dark:bg-black x:py-4 x:ring-1 x:ring-inset x:ring-gray-300 x:dark:ring-neutral-700 x:contrast-more:ring-gray-900 x:contrast-more:dark:ring-gray-50 x:contrast-more:contrast-150 x:rounded-md not-prose","tabIndex":"0","children":[["$","div",null,{"className":"x:group-hover:opacity-100 x:group-focus:opacity-100 x:opacity-0 x:transition x:focus-within:opacity-100 x:flex x:gap-1 x:absolute x:right-4 x:top-2","children":[["$","$La",null,{"children":["$","svg",null,{"viewBox":"0 0 24 24","fill":"currentColor","height":"1em","children":["$","path",null,{"d":"M4 19h6v-2H4v2zM20 5H4v2h16V5zm-3 6H4v2h13.25c1.1 0 2 .9 2 2s-.9 2-2 2H15v-2l-3 3l3 3v-2h2c2.21 0 4-1.79 4-4s-1.79-4-4-4z"}]}]}],false]}],["$","code",null,{"className":"nextra-code","dir":"ltr","children":[["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"{"}]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#005CC5","--shiki-dark":"#79B8FF"},"children":"  \"code\""}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":": "}],["$","span",null,{"style":{"--shiki-light":"#032F62","--shiki-dark":"#9ECBFF"},"children":"\"USER_NOT_FOUND\""}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":","}]]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#005CC5","--shiki-dark":"#79B8FF"},"children":"  \"message\""}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":": "}],["$","span",null,{"style":{"--shiki-light":"#032F62","--shiki-dark":"#9ECBFF"},"children":"\"사용자를 찾을 수 없습니다.\""}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":","}]]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#005CC5","--shiki-dark":"#79B8FF"},"children":"  \"detail\""}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":": "}],["$","span",null,{"style":{"--shiki-light":"#005CC5","--shiki-dark":"#79B8FF"},"children":"null"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":","}]]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#005CC5","--shiki-dark":"#79B8FF"},"children":"  \"timestamp\""}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":": "}],["$","span",null,{"style":{"--shiki-light":"#032F62","--shiki-dark":"#9ECBFF"},"children":"\"2025-11-25T22:10:00+09:00\""}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":","}]]}],"\n",["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#005CC5","--shiki-dark":"#79B8FF"},"children":"  \"path\""}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":": "}],["$","span",null,{"style":{"--shiki-light":"#032F62","--shiki-dark":"#9ECBFF"},"children":"\"/api/users/9999\""}]]}],"\n",["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"}"}]}]]}]]}]]}]}]}]
+44:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":["구체적인 예외 매핑은 ",["$","code",null,{"className":"nextra-code","dir":"ltr","children":"5-exception-handling.mdx"}]," 에서\n",["$","code",null,{"className":"nextra-code","dir":"ltr","children":"@ControllerAdvice"}]," 기반으로 다룰 예정."]}]
+45:["$","hr",null,{"className":"x:my-[2em] nextra-border"}]
+46:["$","h2",null,{"id":"7-실무-기준-핵심-정리","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-10 x:border-b x:pb-1 x:text-3xl nextra-border","children":["7. 실무 기준 핵심 정리",["$","$L9",null,{"id":"7-실무-기준-핵심-정리"}]]}]
+47:["$","ul",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-disc x:ms-[1.5em]","children":["\n",["$","li",null,{"className":"x:my-[.5em]","children":[["$","code",null,{"className":"nextra-code","dir":"ltr","children":"URI"}],"는 ",["$","strong",null,{"children":"명사형 리소스 + 계층 구조"}],"로 설계한다."]}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"동사는 HTTP 메서드에 맡기고, URI에 동사 이름을 넣지 않는다."}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":["엔티티를 직접 노출하지 말고 ",["$","strong",null,{"children":["항상 ",["$","code",null,{"className":"nextra-code","dir":"ltr","children":"DTO"}],"를 사용"]}],"한다."]}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":["요청 DTO에는 ",["$","code",null,{"className":"nextra-code","dir":"ltr","children":"Bean Validation"}],"을 적극적으로 사용한다."]}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":[["$","code",null,{"className":"nextra-code","dir":"ltr","children":"Controller"}],"는 ",["$","strong",null,{"children":"HTTP 입출력"}],", ",["$","code",null,{"className":"nextra-code","dir":"ltr","children":"Service"}],"는 ",["$","strong",null,{"children":"비즈니스 로직"}],", ",["$","code",null,{"className":"nextra-code","dir":"ltr","children":"Repository"}],"는 ",["$","strong",null,{"children":"데이터 접근"}],"만 담당하게 분리한다."]}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"응답 스키마(성공/실패)는 초기에 잘 정해두고, 서비스 전반에서 일관성을 유지한다."}],"\n"]}]
+4a:null
+4b:["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"> "}]
+4c:["$","span",null,{"style":{"--shiki-light":"#6F42C1","--shiki-dark":"#B392F0"},"children":"createUser"}]
+4d:["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"("}]
+4e:["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"            @"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"RequestBody"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":" @"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"Valid"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":" CreateUserRequest "}],["$","span",null,{"style":{"--shiki-light":"#E36209","--shiki-dark":"#FFAB70"},"children":"request"}]]}]
+4f:["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"    ) {"}]}]
+50:["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"        UserResponse response "}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"="}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":" userService."}],["$","span",null,{"style":{"--shiki-light":"#6F42C1","--shiki-dark":"#B392F0"},"children":"createUser"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"(request);"}]]}]
+51:["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"        URI location "}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"="}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":" URI."}],["$","span",null,{"style":{"--shiki-light":"#6F42C1","--shiki-dark":"#B392F0"},"children":"create"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"("}],["$","span",null,{"style":{"--shiki-light":"#032F62","--shiki-dark":"#9ECBFF"},"children":"\"/api/users/\""}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":" +"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":" response."}],["$","span",null,{"style":{"--shiki-light":"#6F42C1","--shiki-dark":"#B392F0"},"children":"id"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"());"}]]}]
+52:["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"        return"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":" ResponseEntity."}],["$","span",null,{"style":{"--shiki-light":"#6F42C1","--shiki-dark":"#B392F0"},"children":"created"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"(location)."}],["$","span",null,{"style":{"--shiki-light":"#6F42C1","--shiki-dark":"#B392F0"},"children":"body"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"(response);"}]]}]
+53:["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"    }"}]}]
+54:["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"}"}]}]
+55:["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":", "}]
+56:["$","span",null,{"style":{"--shiki-light":"#005CC5","--shiki-dark":"#79B8FF"},"children":"max"}]
+57:["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":" ="}]
+58:["$","span",null,{"style":{"--shiki-light":"#005CC5","--shiki-dark":"#79B8FF"},"children":" 50"}]
+59:["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":")"}]
+5a:["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"        String password"}]}]
+5b:["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":") {}"}]}]
+5c:["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"> "}]
+5d:["$","span",null,{"style":{"--shiki-light":"#6F42C1","--shiki-dark":"#B392F0"},"children":"createOrder"}]
+5e:["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"("}]
+5f:["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"            @"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"RequestBody"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":" @"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"Valid"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":" CreateOrderRequest "}],["$","span",null,{"style":{"--shiki-light":"#E36209","--shiki-dark":"#FFAB70"},"children":"request"}]]}]
+60:["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"    ) {"}]}]
+61:["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"        OrderResponse response "}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"="}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":" orderService."}],["$","span",null,{"style":{"--shiki-light":"#6F42C1","--shiki-dark":"#B392F0"},"children":"createOrder"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"(request);"}]]}]
+62:["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"        return"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":" ResponseEntity."}],["$","span",null,{"style":{"--shiki-light":"#6F42C1","--shiki-dark":"#B392F0"},"children":"status"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"(HttpStatus.CREATED)."}],["$","span",null,{"style":{"--shiki-light":"#6F42C1","--shiki-dark":"#B392F0"},"children":"body"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"(response);"}]]}]
+63:["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"    }"}]}]
+64:["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"}"}]}]
+65:["$","span",null,{"style":{"--shiki-light":"#6F42C1","--shiki-dark":"#B392F0"},"children":"quantity"}]
+66:["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"()"}]
+67:["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"        );"}]}]
+68:["$","span",null,{"children":" "}]
+69:["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"        orderRepository."}],["$","span",null,{"style":{"--shiki-light":"#6F42C1","--shiki-dark":"#B392F0"},"children":"save"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"(order);"}]]}]
+6a:["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":"        return"}],["$","span",null,{"style":{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},"children":" new"}],["$","span",null,{"style":{"--shiki-light":"#6F42C1","--shiki-dark":"#B392F0"},"children":" OrderResponse"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"(order."}],["$","span",null,{"style":{"--shiki-light":"#6F42C1","--shiki-dark":"#B392F0"},"children":"getId"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"(), order."}],["$","span",null,{"style":{"--shiki-light":"#6F42C1","--shiki-dark":"#B392F0"},"children":"getStatus"}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"());"}]]}]
+6b:["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"    }"}]}]
+6c:["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"}"}]}]
+6d:["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":","}]
+6e:["$","span",null,{"children":[["$","span",null,{"style":{"--shiki-light":"#005CC5","--shiki-dark":"#79B8FF"},"children":"  \"totalPages\""}],["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":": "}],["$","span",null,{"style":{"--shiki-light":"#005CC5","--shiki-dark":"#79B8FF"},"children":"3"}]]}]
+6f:["$","span",null,{"children":["$","span",null,{"style":{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},"children":"}"}]}]

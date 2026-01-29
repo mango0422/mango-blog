@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "ghpages": "GITHUB_PAGES=1 pnpm build",
     "postbuild": "pagefind --site docs --output-path docs/_pagefind",
     "build:zip": "pnpm build && cd docs && zip -r ../docs.zip .",
     "start": "next start",
